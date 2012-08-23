@@ -47,10 +47,9 @@ void CMySerial::OnDisconnect()
 }
 
 
-void CMySerial::OnData()
+void CMySerial::OnData(unsigned char *buffer, int length)
 {
-    FoldLine(GetBuffer(),GetLength());
-	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",(void*)GetBuffer());
+    _Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",(void*)buffer);
     
 }
 
@@ -114,11 +113,12 @@ void CMySerial::OnBeforeMainLoop()
 {
 }
 
-void CMySerial::Parse(char *buffer, int length)
+
+void CMySerial::OnLine(unsigned char *line)
 {
-     if(nmea_parse(&_parser, buffer, length, &_info))
+	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info))
 		_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
-		 
+
 }
 
 
@@ -144,7 +144,7 @@ void CMySerial::FoldLine( unsigned char *Buffer, int BufferLength )
         {
             ptr_Buffer++;
             memcpy( ( char *)_LineBuffer + _LineBufLen, ( const char *)ptr1, ( ptr_Buffer-ptr1 ) );
-            Parse((char*)_LineBuffer, ( ptr_Buffer - ptr1 ) );
+            //Parse((char*)_LineBuffer, ( ptr_Buffer - ptr1 ) );
             memset( _LineBuffer, 0, BUFFER_LENGTH );
             _LineBufLen = 0;
             ptr1 = ptr_Buffer;

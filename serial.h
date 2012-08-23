@@ -21,7 +21,7 @@ class CMySerial :public CSerial
 		double _AreaSize;							// selection area defined in spin ctrl (but changed to minutes)
 
 		void FoldLine( unsigned char *Buffer, int BufferLength );
-		void Parse(char *Buffer, int Length);
+		//void Parse(char *Buffer, int Length);
 		void BuildPortList();						// buduje liste portów
 		void SendInfoEvent(wxString info_text);     // wysylaj event do okienka informacyjnego
 
@@ -36,7 +36,8 @@ public:
 		virtual void OnInvalid();
 		virtual void OnConnect();
 		virtual void OnDisconnect();
-		virtual void OnData();
+		virtual void OnData(unsigned char *buffer, int length);
+		virtual void OnLine(unsigned char* line);
 		virtual void OnStart();
 		virtual void OnStop();
 		virtual void OnNewScan();
