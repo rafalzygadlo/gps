@@ -198,10 +198,10 @@ void CDisplayPlugin::DrawStatus(wxGCDC &dc)
 				DrawData(dc,Caption,wxString::Format(_("%s:%d"),port.wc_str(),MySerial->GetBaudRate()));
 			}else{
 				wxString port(MySerial->GetPortName(),wxConvUTF8);
-				DrawData(dc,Caption,wxString::Format(_("Searching %s:%d"),port.wc_str(),MySerial->GetBaudRate()));
+				DrawData(dc,Caption,wxString::Format(_("Connected %s:%d"),port.wc_str(),MySerial->GetBaudRate()));
 			}
 		}else{
-			DrawData(dc,Caption,_("Start Serial"));
+			DrawData(dc,Caption,_("Connect Serial"));
 		}
 	}else{
 		DrawData(dc,Caption,_("Start Gps"));
