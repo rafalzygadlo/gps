@@ -121,35 +121,3 @@ void CMySerial::OnLine(unsigned char *line)
 
 }
 
-
-void CMySerial::FoldLine( unsigned char *Buffer, int BufferLength )
-{
-    unsigned char *ptr_Buffer, *ptr1;
-    ptr1 = ptr_Buffer = Buffer;
-    
-    while ( *ptr_Buffer )
-    {
-        ptr_Buffer++;
-        if ( !*ptr_Buffer )
-        {
-            _LineBufLen = POS_IN_BUF( ptr1, ptr_Buffer );
-            memset( _LineBuffer, 0, BUFFER_LENGTH );
-            memcpy( _LineBuffer, ptr1, _LineBufLen );
-            return;
-        }
-
-        if ( *ptr_Buffer == 13 )
-            ptr_Buffer++;
-        if ( *ptr_Buffer == 10 )
-        {
-            ptr_Buffer++;
-            memcpy( ( char *)_LineBuffer + _LineBufLen, ( const char *)ptr1, ( ptr_Buffer-ptr1 ) );
-            //Parse((char*)_LineBuffer, ( ptr_Buffer - ptr1 ) );
-            memset( _LineBuffer, 0, BUFFER_LENGTH );
-            _LineBufLen = 0;
-            ptr1 = ptr_Buffer;
-        }
-    }
-
-}
-

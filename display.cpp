@@ -758,8 +758,7 @@ const wchar_t *NaviDisplayIntroduce(int LanguageID)
 		default:
 			return L"GPS";
 	}
-	
-	return L"GPS";
+
 }
 
 const int NaviDisplayID()

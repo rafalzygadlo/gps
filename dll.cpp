@@ -257,10 +257,32 @@ void CMapPlugin::SetNMEAInfoFunc(nmeaINFO *_nmea)
 	if(NmeaInfo.sig == 0)
 		return;
 	
-	_X = NmeaInfo.lon / 100;
-	_Y = NmeaInfo.lat / 100;
+	GpsX = _X = NmeaInfo.lon / 100;
+	GpsY = _Y = NmeaInfo.lat / 100;
     _Y = _Y * (-1);
-	Broker->Unproject(_X,_Y, &GpsX,&GpsY);
+
+	int decimal = (int)GpsX;
+    float minutes = ((float)(GpsX - decimal) * 60) / 100;
+    float pos = decimal + minutes;
+	
+	
+	/*
+	nvDMS *DmToDms( nvDM *PosDm, nvDMS *PosDms ) {
+
+       if ( !PosDm )
+             return PosDms;
+
+       PosDms->Deg = 
+       PosDms->Min = int( GpsX );
+       PosDms->Sec = ( PosDm->Min - double( PosDms->Min ) ) * 60;
+       PosDms->Sig = PosDm->Sig;
+       
+       return PosDms;
+	   */
+
+
+
+	Broker->Unproject(pos,_Y, &GpsX,&GpsY);
 	AddPoint(GpsX,GpsY,_nmea);
 	Broker->Refresh(Broker->GetParentPtr());
 	
@@ -550,10 +572,16 @@ void CMapPlugin::RenderPosition()
 	if(_MouseOverIcon)
         glColor4f(1.0f,1.0f,1.0f,0.8f);
 
+	glPointSize(5);
+	glBegin(GL_POINTS);
+		glVertex2f(16.00,-59.43);
+	glEnd();
+
+
 	glPushMatrix();
 		glTranslated(GpsX,GpsY,0.0);
 		glScalef(50.0/Scale,50.0/Scale,0.0f);
-		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
+		//glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
 		RenderGeometry(GL_LINE_LOOP,&vCircle1[0],vCircle1.size());	// circle 0
 		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 1
 		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 1
