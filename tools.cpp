@@ -2,6 +2,19 @@
 #include "tools.h"
 #include <wx/stdpaths.h>
 
+
+double DD( float DM ) 
+{
+
+	int ddeg = ( int )(DM / 100);
+	double min =  ( double )( DM / 100 - ddeg);
+	double x = double ( min / 60 ) * 100;
+	double a = ( double ) ddeg + x;
+
+	return a;
+
+}
+
 wxString ConvertDegree(float degree) 
 {
 	int decimal = (int)degree;
