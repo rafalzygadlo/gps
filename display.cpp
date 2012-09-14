@@ -2,6 +2,7 @@
 #include "tools.h"
 #include "display.h"
 #include <wx/wx.h>
+#include <wx/listctrl.h>
 
 BEGIN_EVENT_TABLE(CDisplayPlugin,CNaviDiaplayApi)
     EVT_CONTEXT_MENU(CDisplayPlugin::OnMenu)
@@ -46,6 +47,7 @@ CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& p
 	ArrayOfTypes.Add(_("Quality"));
 	ArrayOfTypes.Add(_("Sattelites"));
 	ArrayOfTypes.Add(_("Status"));
+	ArrayOfTypes.Add(_("Tracks"));
 		
 	if(!FileConfig->Read(wxString::Format(_("%s/%s"),Name.wc_str(),_(KEY_CONTROL_TYPE)),&ControlType))
 		ControlType = DEFAULT_CONTROL_TYPE;
@@ -296,7 +298,7 @@ void CDisplayPlugin::DrawData(wxGCDC &dc, wxString caption, wxString text)
 }
 void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 {
-	/*
+	
 	if(Panel != NULL)
 		return; // nie rysuj kontrolek
 	
@@ -330,19 +332,21 @@ void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 		
 	this->SetSizer(MainSizer);
 		
-				
-	std::vector<CTrack*> Tracks = GpsDLL->GetTrackList()->GetList();
+	if(MapPlugin != NULL)
+	{			
+		std::vector<CTrack*> Tracks = MapPlugin->GetTrackList()->GetList();
 		
-	for(int i = 0; i< Tracks.size(); i++)
-	{	
-		TrackList->Append(wxString::Format(_("%s"), Tracks[i]->GetTrackName().wc_str()));
+		for(int i = 0; i< Tracks.size(); i++)
+		{	
+			TrackList->Append(wxString::Format(_("%s"), Tracks[i]->GetTrackName().wc_str()));
 		
-		if(Tracks[i]->GetVisible())
-			TrackList->Check(i,true);
+			if(Tracks[i]->GetVisible())
+				TrackList->Check(i,true);
+		}
 	}
 		
 	Panel->SetSize(GetWidth(),GetHeight());
-	*/
+	
 }
 
 void CDisplayPlugin::DrawDate(wxGCDC &dc)

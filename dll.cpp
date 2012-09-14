@@ -30,8 +30,8 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	CreateSumbols();
 	CreateApiMenu();
 	Track = new CTrack();
-//	TrackList = new CTrackList();
-//	TrackList->AddTrack(Track);
+	TrackList = new CTrackList();
+	TrackList->AddTrack(Track);
 	GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
@@ -45,8 +45,8 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 CMapPlugin::~CMapPlugin()
 {
 	delete DisplaySignal;
-//	delete Track;
-//	delete TrackList;
+	delete Track;
+	delete TrackList;
 	MyFrame = NULL;
 	MySerial = NULL;
 }
@@ -168,23 +168,6 @@ void CMapPlugin::Kill(void)
 	SendDisplaySignal(NULL);
 
 }
-
-/*
-void CMapPlugin::SetValids(bool valid)
-{
-	DisplaySignal->SetData((void*)DisplaySignal,sizeof(DisplaySignal));
-	GetBroker()->SendDisplaySignal((void*)DisplaySignal);
-	    
-	bool *Valids = GetBroker()->GetValids();
-    Valids[X_VALUE] = valid;
-    Valids[Y_VALUE] = valid;
-    Valids[AREA_MINX] = valid;
-    Valids[AREA_MINY] = valid;
-    Valids[AREA_MAXX] = valid;
-    Valids[AREA_MAXY] = valid;
-}
-
-*/
 
 bool CMapPlugin::GetNeedExit(void)
 {
@@ -337,15 +320,12 @@ void CMapPlugin::SetBaudFunc(int baud)
 	
 }
 
-
-
-
 void CMapPlugin::BuildGeometry()
 {
     // first circle
     SPoint Points;
     float Radius = 0.2f;
-    CircleRadius = Radius;
+    
     for(int i=0; i<360; i+=6)
     {
         Points.x = Radius*(float)sin(i*PI/180.0);
@@ -362,8 +342,9 @@ void CMapPlugin::BuildGeometry()
         vCircle2.push_back(Points);
     }
 
-	// second circle
+	// third circle
     Radius = 1.0f;
+	CircleRadius = Radius;
     for(int i=0; i<360; i+=6)
     {
         Points.x = Radius*(float)sin(i*PI/180.0);
@@ -419,11 +400,16 @@ void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 	double _x,_y;
 	
 	Broker->GetMouseOM(mom);
+	
+	momX = mom[0];
+	momY = mom[1];
+	
 	Broker->Unproject(mom[0],mom[1],&_x,&_y);
 	_y = _y *-1;
 	
-	double MapX = _x;
-	double MapY = _y;
+	MouseX = _x;
+	MouseY = _y;
+	
 	
 	if(rmb)
 		return;
@@ -452,24 +438,21 @@ void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 	}
 	*/
 	
-//	double mom[4];
-//  float xs, ys;
-//  double _x, _y;
-//  float scale = Broker->GetMapScale();
-//  xs = _X; ys = _Y;						// srodek ko³a
-//  float r = CircleRadius;                 // promieñ
-//   GetBroker()->GetMouseOM(mom);
-//   _y = mom[1] ; _x = mom[0];
 
-//  float left = (((_x-xs)*(_x-xs) + (_y-ys)*(_y-ys)));
-//  float right = (r*r);
+	double xs, ys;
+	xs = GpsX; ys = GpsY;					// srodek ko³a
+	double r = CircleRadius * (50/Scale);   // promieñ
+	_y = MouseY  ; _x = MouseX;
 
-//  if(left <= right)
-//  {
-//    	_MouseOverIcon = true;
-//  }else{
-//    	_MouseOverIcon = false;
-//    }
+	double left = (((_x-xs)*(_x-xs) + (_y-ys)*(_y-ys)));
+	double right = r * r;
+
+	if(left < right)
+	{
+    		_MouseOverIcon = true;
+	}else{
+    		_MouseOverIcon = false;
+    }
 
 }
 
@@ -512,30 +495,22 @@ void CMapPlugin::RenderTracks()
 
 }
 
+
 void CMapPlugin::RenderSelection()
 {
-	/*
-	// render selection on basemap
-    // wtedy kiedy okno konfiguracji jest widoczne
-    double *val = GetBroker()->GetValues();
-    minX = val[6];
-    minY = val[7];
-    maxX = val[8];
-    maxY = val[9];
 
-	if(MyFrame != NULL && _nmeaINFO.fix > 0 && _ShowHint)
-    {
-        glColor4f(0.0f,0.0f,1.0f,0.4f);
-        glBegin(GL_QUADS);
-        glColor4f(0.0f,0.0f,1.0f,0.4f);
-        glVertex2d(minX,minY*-1);
-        glVertex2d(minX,maxY*-1);
-        glVertex2d(maxX,maxY*-1);
-        glVertex2d(maxX,minY*-1);
-        glEnd();
-    }
+	glPushMatrix();
+		glTranslated(GpsX,GpsY,0.0);
+		glScalef(50.0/Scale,50.0/Scale,0.0f);
+		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
+		glBegin(GL_QUADS);
+			glVertex2f(vCircle3[ 0].x,vCircle3[ 0].y);
+			glVertex2f(vCircle3[15].x,vCircle3[15].y);
+			glVertex2f(vCircle3[30].x,vCircle3[30].y);
+			glVertex2f(vCircle3[45].x,vCircle3[45].y);
+		glEnd();
+    glPopMatrix();
 
-	*/
 }
 
 void CMapPlugin::RenderPosition()
@@ -551,8 +526,7 @@ void CMapPlugin::RenderPosition()
 		
 	glColor4f(0.0f,0.0f,1.0f,0.8f);
 
-	if(_MouseOverIcon)
-        glColor4f(1.0f,1.0f,1.0f,0.8f);
+	
 
 	glPointSize(5);
 	glBegin(GL_POINTS);
@@ -607,6 +581,18 @@ void CMapPlugin::RenderAnimation()
 		AnimMarkerSize = 100.0f;
 
 }
+void CMapPlugin::RenderMouseXY()
+{
+	glPointSize(10);
+	glColor3f(1.0,0.0,0.0);
+	
+	glBegin(GL_POINTS);
+		glVertex2d(MouseX,MouseY);
+	glEnd();
+	
+	glPointSize(1);
+}
+
 
 void CMapPlugin::Render(void)
 {
@@ -624,8 +610,12 @@ void CMapPlugin::Render(void)
 		CreateTextures();
 	    
 	RenderPosition();
-    RenderSelection();
+    
+	if(_MouseOverIcon)
+		RenderSelection();
+        
 	RenderAnimation();	
+	RenderMouseXY();
 		
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

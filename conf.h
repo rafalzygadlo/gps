@@ -8,8 +8,6 @@ typedef enum nvLon		{nvdegree, NVLON_COUNT = 1};
 typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 
 
-
-
 #define COMMENT
 #define PI 3.1415926535897932384626433832795
 
@@ -58,7 +56,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define AREA_MAXX	8
 #define AREA_MAXY	9
 
-//#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
+#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
 
 // messages
 #define MSG_0 "Not valid GPS signal"

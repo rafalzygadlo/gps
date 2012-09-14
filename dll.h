@@ -35,6 +35,8 @@ class CMapPlugin :public CNaviMapIOApi
 {
 	bool MapPluginIsOn;
 	double GpsX, GpsY;
+	double momX, momY;
+	double MouseX,MouseY;
 	long DisplaySignalType;
 	nmeaINFO NmeaInfo;
 	CMyFrame *MyFrame;
@@ -94,6 +96,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void SendDisplaySignal(CMapPlugin *MapPlugin);
 	void SetPortFunc(char *port);
 	void SetBaudFunc(int baud);
+	void RenderMouseXY();
 					
 public:
 

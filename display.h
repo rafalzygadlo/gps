@@ -9,9 +9,6 @@
 #include "NaviDisplayApi.h"
 
 #include <wx/fileconf.h>
-//#include <wx/stdpaths.h>
-//#include <wx/dir.h>
-//#include "tgamem.h"
 #include "serial.h"
 
 #ifdef _WIN32
