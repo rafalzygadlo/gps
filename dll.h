@@ -127,7 +127,7 @@ public:
 	virtual void Render(void);
 	virtual void Config();
 	virtual void Mouse(int x, int y, bool lmb, bool mmb, bool rmb );
-
+	virtual void MouseDBLClick(int x, int y);
 		
 	// funkcje dostêpne dla innych pluginów
 	static void *SetExit(void *NaviMapIOApiPtr, void *Params);			// serial port ustawia flagê zakoñczenia dzia³ania

@@ -395,7 +395,7 @@ bool CMapPlugin::IsPointInsideBox(double px, double py, double bx1, double by1, 
 
 void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 {
-
+	
 	double mom[2];
 	double _x,_y;
 	
@@ -438,23 +438,32 @@ void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 	}
 	*/
 	
-
-	double xs, ys;
-	xs = GpsX; ys = GpsY;					// srodek ko³a
-	double r = CircleRadius * (50/Scale);   // promieñ
-	_y = MouseY  ; _x = MouseX;
-
-	double left = (((_x-xs)*(_x-xs) + (_y-ys)*(_y-ys)));
-	double right = r * r;
-
-	if(left < right)
+	if(lmb)
 	{
-    		_MouseOverIcon = true;
-	}else{
+		double xs, ys;
+		double _x,_y;
+		xs = GpsX; ys = GpsY;					// srodek ko³a
+		double r = CircleRadius * (50/Scale);   // promieñ
+		_y = MouseY  ; _x = MouseX;
+
+		double left = (((_x-xs)*(_x-xs) + (_y-ys)*(_y-ys)));
+		double right = r * r;
+
+		if(left < right)
+			_MouseOverIcon = true;
+		else
     		_MouseOverIcon = false;
-    }
+		
+	}
 
 }
+
+void CMapPlugin::MouseDBLClick(int x, int y)
+{
+	if(_MouseOverIcon)
+		Config();
+}
+
 
 void CMapPlugin::AddPoint(double x, double y, nmeaINFO *info)
 {
@@ -488,7 +497,10 @@ void CMapPlugin::RenderTracks()
 		
 		std::vector<SPoint> pts = Tracks[i]->GetTrackPoints();
 		if(pts.size() > 0)
-			RenderGeometry(GL_LINE_LOOP,&pts[0], pts.size());			// punkty z gpsa
+		{
+			RenderGeometry(GL_POINTS,&pts[0], pts.size());			// punkty z gpsa
+			RenderGeometry(GL_LINE_LOOP,&pts[0], pts.size());			// linie
+		}
     }
 	
 	glDisable(GL_POINT_SMOOTH);
@@ -524,17 +536,9 @@ void CMapPlugin::RenderPosition()
 		return;
 		
 		
-	glColor4f(0.0f,0.0f,1.0f,0.8f);
-
-	
-
-	glPointSize(5);
-	glBegin(GL_POINTS);
-		glVertex2f(16.00,-59.43);
-	glEnd();
-
-
+	glColor4f(0.0f,0.0f,1.0f,0.5f);
 	glPushMatrix();
+		glLineWidth(2);
 		glTranslated(GpsX,GpsY,0.0);
 		glScalef(50.0/Scale,50.0/Scale,0.0f);
 		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
@@ -542,6 +546,7 @@ void CMapPlugin::RenderPosition()
 		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 1
 		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 1
 		RenderGeometry(GL_LINES,&vLineH[0],vLineH.size());			// line H
+		glLineWidth(1);
     glPopMatrix();
 
 }
@@ -616,6 +621,7 @@ void CMapPlugin::Render(void)
         
 	RenderAnimation();	
 	RenderMouseXY();
+	RenderTracks();
 		
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

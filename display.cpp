@@ -171,14 +171,14 @@ void CDisplayPlugin::OnListCheck(wxCommandEvent &event)
 
 void CDisplayPlugin::OnListBox(wxCommandEvent &event)
 {	
-//	TrackData->Clear();
-//	std::vector<SPointInfo> info = GpsDLL->GetTrackList()->GetList()[event.GetSelection()]->GetTrack();
-//	for(int i = 0; i < info.size();i++)
-//		TrackData->Append(wxString::Format(_("%4.2f %4.2f"),info[i].nmea_info.lat,info[i].nmea_info.lat));
+	TrackData->Clear();
+	std::vector<SPointInfo> info = MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->GetTrack();
+	for(int i = 0; i < info.size();i++)
+		TrackData->Append(wxString::Format(_("%4.2f %4.2f"),info[i].nmea_info.lat,info[i].nmea_info.lat));
 	
-	//bool checked = TrackList->IsChecked(event.GetSelection());
+	bool checked = TrackList->IsChecked(event.GetSelection());
 
-	//GpsDLL->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
+	MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
 }
 
 
@@ -322,8 +322,6 @@ void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 
 	wxBoxSizer *Panel1Sizer = new wxBoxSizer(wxVERTICAL);
 	wxPanel *Panel1 = new wxPanel(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-	Panel->SetBackgroundColour(*wxGREEN);
-	Panel1->SetBackgroundColour(*wxRED);
 	PanelSizer->Add(Panel1,0,wxALL|wxEXPAND,5);
 		
 	wxButton *Delete = new wxButton(Panel1,ID_DELETE,_("Delete"),wxDefaultPosition,wxDefaultSize);
