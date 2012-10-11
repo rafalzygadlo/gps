@@ -181,8 +181,6 @@ void CDisplayPlugin::OnListBox(wxCommandEvent &event)
 	MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
 }
 
-
-
 void CDisplayPlugin::DrawStatus(wxGCDC &dc)
 {
 		
