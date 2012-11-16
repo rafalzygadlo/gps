@@ -214,6 +214,8 @@ void *CMapPlugin::MenuConfig(void *NaviMapIOApiPtr, void *Input)
 
 void CMapPlugin::Config()
 {
+	if(NeedExit)
+		return;
 
 #if defined(_WIN32) || defined(_WIN64)
 	MyFrame = new CMyFrame(this);
@@ -642,7 +644,7 @@ void CMapPlugin::Render(void)
         
 	RenderAnimation();	
 	RenderMouseXY();
-	RenderTracks();
+	//RenderTracks();
 		
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

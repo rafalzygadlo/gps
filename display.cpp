@@ -20,7 +20,7 @@ const wxChar *nvDegrees[] = {_("180"), _("225"), _("270"), _("315"), _("0"), _("
 CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style, const wxString& name) 
 :CNaviDiaplayApi( parent, id, pos, size, style, name )
 {
-	
+	IsDrawning = false;
 	nmea_zero_INFO(&info);
 	MapPlugin = NULL;
     Broker = NULL;
@@ -263,6 +263,10 @@ void CDisplayPlugin::Draw(wxGCDC &dc)
 
 void CDisplayPlugin::DrawData(wxGCDC &dc, wxString caption, wxString text)
 {
+	if(IsDrawning)
+		return;
+	
+	IsDrawning = true;
 	
 	Caption = caption;
 	int Size;
@@ -283,15 +287,20 @@ void CDisplayPlugin::DrawData(wxGCDC &dc, wxString caption, wxString text)
 
 	if( FontSize.GetWidth() > GetWidth() ) 
 	{
-		do {
-
+		do 
+		{
 			Font.SetPointSize( Font.GetPointSize() - 1 );
 			dc.SetFont( Font );
-			FontSize = dc.GetTextExtent(text);
+			if(dc.IsOk())
+				FontSize = dc.GetTextExtent(text);
+			else
+				int a =0;
+		
 		} while ( FontSize.GetWidth() > GetWidth() );
 	}
 
-	dc.DrawText( text, GetWidth()/2 - FontSize.GetWidth()/2, GetHeight() * 0.625 - FontSize.GetHeight() / 2 );
+	dc.DrawText( text, (int)GetWidth()/2 - FontSize.GetWidth()/2, (int)GetHeight() * 0.625 - FontSize.GetHeight() / 2 );
+	IsDrawning = false;
 	
 }
 void CDisplayPlugin::DrawTracks(wxGCDC &dc)
@@ -714,6 +723,7 @@ bool CDisplayPlugin::IsValidSignal(CDisplaySignal *SignalID) {
 	}
 	
 	return false;
+	//return true;
 }
 
 void CDisplayPlugin::OnRender(wxGCDC &dc) 
