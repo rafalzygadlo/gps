@@ -3,7 +3,7 @@
 #include "dll.h"
 #include "tools.h"
 
-CMySerial::CMySerial(CNaviBroker *Broker):CSerial(DEVICE_GPS)
+CMySerial::CMySerial(CNaviBroker *Broker):CSerial()
 {
     _IsRunning = false;
 	_Broker = Broker;
@@ -95,11 +95,6 @@ void CMySerial::OnReconnect()
 	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",&str);
 	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetPort",GetPortName());
 	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetBaud",(void*)GetBaudRate());
-}
-
-void CMySerial::OnNewScan()
-{
-    //SendInfoEvent(_(MSG_5));
 }
 
 void CMySerial::OnAfterMainLoop()

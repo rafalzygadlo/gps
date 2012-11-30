@@ -40,7 +40,6 @@ public:
 		virtual void OnLine(unsigned char* line);
 		virtual void OnStart();
 		virtual void OnStop();
-		virtual void OnNewScan();
 		virtual void OnAfterMainLoop();
 		virtual void OnBeforeMainLoop();
 		virtual void OnExit();			// no gps found plugin ends working

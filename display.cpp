@@ -192,7 +192,7 @@ void CDisplayPlugin::DrawStatus(wxGCDC &dc)
 		
 		if(MySerial->IsRunning())
 		{
-			if(MySerial->IsValidDevice())
+			if(MySerial->IsRunning())
 			{
 				wxString port(MySerial->GetPortName(),wxConvUTF8);
 				DrawData(dc,Caption,wxString::Format(_("%s:%d"),port.wc_str(),MySerial->GetBaudRate()));
