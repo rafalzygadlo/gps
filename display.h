@@ -22,7 +22,7 @@ extern "C" {
 
 class NAVIDISPLAYAPI CDisplayPlugin: public CNaviDiaplayApi 
 {
-	
+	bool IsDrawning;
 	CNaviBroker *Broker;
 	CMapPlugin *MapPlugin;
 	wxCheckListBox *TrackList;

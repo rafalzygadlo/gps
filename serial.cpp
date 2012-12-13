@@ -97,11 +97,6 @@ void CMySerial::OnReconnect()
 	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetBaud",(void*)GetBaudRate());
 }
 
-void CMySerial::OnNewScan()
-{
-    //SendInfoEvent(_(MSG_5));
-}
-
 void CMySerial::OnAfterMainLoop()
 {
 	bool flag = true;
