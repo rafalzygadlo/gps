@@ -62,11 +62,11 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	PanelSizer->Add(BottomSizer,0,wxEXPAND,0);
 
 	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
-	PortComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL,wxCB_READONLY);
+	PortComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL);
 	PortComboBox->Disable();
 	ButtonSizer->Add(PortComboBox,1,wxALL|wxEXPAND,2);
 	
-	BaudComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL,wxCB_READONLY);
+	BaudComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL);
 	BaudComboBox->Disable();
 	ButtonSizer->Add(BaudComboBox,1,wxALL|wxEXPAND,2);
 
@@ -191,6 +191,15 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	//_SetStatusText(wxString::Format(_(MSG_2),_MapPlugin->GetMySerial()->GetPortNumber(),_MapPlugin->GetMySerial()->GetBaudRate()));
 	if(MapPlugin->GetMySerial() != NULL)
 	{
+		CMySerial *serial = _MapPlugin->GetMySerial();
+		serial->ScanPorts();
+
+		for(size_t i = 0; i < serial->GetPortInfoLength();i++)
+		{
+			wxString port(serial->GetPortInfo(i).port_name,wxConvUTF8);
+			PortComboBox->Append(port);
+		}
+		
 		wxString buf(_MapPlugin->GetMySerial()->GetPortName(),wxConvUTF8);
 		PortComboBox->SetValue(buf);
 		BaudComboBox->SetValue(wxString::Format(_("%d"),_MapPlugin->GetMySerial()->GetBaudRate()));
@@ -213,7 +222,7 @@ CMyFrame::~CMyFrame(void)
 void CMyFrame::OnComboBox(wxCommandEvent &event)
 {
 	PortSelection = event.GetSelection();
-	MapPlugin->GetMySerial()->SetPortIndex(event.GetSelection());
+//	MapPlugin->GetMySerial()->SetPortIndex(event.GetSelection());
 }
 
 void CMyFrame::OnCloseButton(wxCommandEvent &event)
@@ -247,8 +256,10 @@ void CMyFrame::OnStartButton(wxCommandEvent &event)
 	BaudComboBox->Disable();
 	PortComboBox->SetValue(port);
 	BaudComboBox->SetValue(baud);
-	MapPlugin->GetMySerial()->SetPortIndex(PortComboBox->GetSelection());
-	MapPlugin->GetMySerial()->SetBaudIndex(BaudComboBox->GetSelection());
+	MapPlugin->GetMySerial()->SetPort(PortComboBox->GetValue().char_str());
+	long _baud;
+	BaudComboBox->GetValue().ToLong(&_baud);
+	MapPlugin->GetMySerial()->SetBaud(_baud);
 		
 	MapPlugin->GetMySerial()->Start();
 }

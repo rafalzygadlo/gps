@@ -26,7 +26,7 @@ class CMySerial :public CSerial
 		void SendInfoEvent(wxString info_text);     // wysylaj event do okienka informacyjnego
 
 public:
-		CMySerial(CNaviBroker *_Broker);
+		CMySerial(CNaviBroker *Broker);
 		~CMySerial();
 		nmeaINFO GetNmeaINFO();
 		bool IsValidGPS();					// zwraca flagê czy prawid³owy sygna³ gps (mo¿e byæ nie z synchronizowany)
@@ -45,6 +45,7 @@ public:
 		virtual void OnBeforeMainLoop();
 		virtual void OnExit();			// no gps found plugin ends working
 		virtual void OnReconnect();
+		virtual void OnNoSignal();
 };
 
 

@@ -85,8 +85,8 @@ CTrackList *CMapPlugin::GetTrackList()
 void CMapPlugin::WriteConfig()
 {
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
-	FileConfig->Write(_(KEY_PORT_INDEX),MySerial->GetPortIndex());
-	FileConfig->Write(_(KEY_BAUD_INDEX),MySerial->GetBaudIndex());
+//	FileConfig->Write(_(KEY_PORT_INDEX),MySerial->GetPortIndex());
+//	FileConfig->Write(_(KEY_BAUD_INDEX),MySerial->GetBaudIndex());
 	delete FileConfig;
 }
 
@@ -136,7 +136,7 @@ CNaviBroker *CMapPlugin::GetBroker()
 
 void CMapPlugin::Run(void *Params)
 {
-    
+    fprintf(stderr,"Loading GPS plugin.");
     MyFrame = NULL;
     MySerial = new CMySerial(Broker);
 	    
@@ -146,11 +146,11 @@ void CMapPlugin::Run(void *Params)
 	
     int port_index;
 	FileConfig->Read(_(KEY_PORT_INDEX), &port_index);
-	MySerial->SetPortIndex(port_index);
+	MySerial->SetPort("COM1");
 
 	int baud_index;
 	FileConfig->Read(_(KEY_BAUD_INDEX), &baud_index);
-	MySerial->SetBaudIndex(baud_index);
+	MySerial->SetBaud(4800);
 
     MySerial->Start();
 
