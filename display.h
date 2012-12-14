@@ -9,6 +9,7 @@
 #include "NaviDisplayApi.h"
 
 #include <wx/fileconf.h>
+#include <wx/listctrl.h>
 #include "serial.h"
 
 #ifdef _WIN32
@@ -41,12 +42,14 @@ class NAVIDISPLAYAPI CDisplayPlugin: public CNaviDiaplayApi
 	wxString Name;
 	wxString ConfigPath;
 	int _Radius;
+	wxListCtrl *List;
 	
 	int GetControlType();
 	wxString GetCaption();
 	bool CheckGpsValid(wxGCDC &dc);
 	double FormatValue(double data, int type);
 	void OnMenu(wxContextMenuEvent &event);
+	void DrawSignals(wxGCDC &dc);
 	void DrawQuality(wxGCDC &dc);
 	void DrawFix(wxGCDC &dc);
 	void DrawData(wxGCDC &dc, wxString caption,wxString text);
@@ -97,6 +100,7 @@ public:
 		ID_SATELLITES,
 		ID_STATUS,
 		ID_TRACKS,
+		ID_SIGNALS,
 		// buttons DrawTracks
 		ID_DELETE,
 		ID_TRACK_LIST,

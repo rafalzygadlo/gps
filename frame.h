@@ -7,9 +7,9 @@
 #include <wx/spinctrl.h>
 #include <vector>
 #include <wx/dcbuffer.h>
+#include <wx/hyperlink.h>
 #include "NaviMapIOApi.h"
 #include "dll.h"
-
 
 
 typedef struct
@@ -55,8 +55,10 @@ class CMyFrame: public wxDialog
 	void OnComboBox(wxCommandEvent &event);
 	// custom events to send text from thread
 	void OnSetLog(wxCommandEvent &event);
-	void OnSetPort(wxCommandEvent &event);
+	//void OnSetPort(wxCommandEvent &event);
 	void OnSetBaud(wxCommandEvent &event);
+	void OnScanPorts(wxHyperlinkEvent &event);
+	void OnInfo(wxHyperlinkEvent &event);
 	
 
 public:
@@ -69,14 +71,14 @@ public:
 	void _SetConfigPathText(wxString text);
 	void _SetPort();
 	void _SetGpsFix(int fix);
-	wxSpinCtrl *_GetSpin();
-	wxComboBox *_GetPortComboBox();
-	wxTextCtrl *_GetTextCtrl();
-	void RefreshPortsList();
-	void RefreshBaudList();
+	//wxSpinCtrl *_GetSpin();
+	//wxComboBox *_GetPortComboBox();
+	//wxTextCtrl *_GetTextCtrl();
+	//void RefreshPortsList();
+	//void RefreshBaudList();
 	void SetLogEvent(wxString str);	
-	void SetPortEvent(wxString str);
-	void SetBaudEvent(wxString str);
+	//void SetPortEvent(wxString str);
+	//void SetBaudEvent(wxString str);
 
 	DECLARE_EVENT_TABLE();
 
@@ -86,11 +88,9 @@ public:
 		ID_STOP,
 		ID_CLOSE,
 		ID_PORTS,
-		ID_TRANSPARENT,
 		ID_CHECK_LOG,
-		ID_CHECK_HINT,
 		ID_REFRESH,
-		ID_SPIN,
+		ID_INFO
 	};
 };
 

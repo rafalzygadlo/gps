@@ -47,6 +47,11 @@ void CMySerial::OnDisconnect()
 }
 
 
+void CMySerial::OnNewSignal()
+{
+	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_NewSignal",NULL);
+}
+
 void CMySerial::OnData(unsigned char *buffer, int length)
 {
     _Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",(void*)buffer);
@@ -118,5 +123,6 @@ void CMySerial::OnLine(unsigned char *line)
 
 void CMySerial::OnNoSignal()
 {
-
+	_info.sig = 0;
+	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
 }

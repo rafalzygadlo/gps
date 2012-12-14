@@ -13,5 +13,6 @@ double ConvertDegreeDouble(float degree);
 wxString FormatLongitude(float x);
 wxString FormatLatitude(float y);
 double DD(float DM);
+wxString GetMsg(int id);
 
 #endif

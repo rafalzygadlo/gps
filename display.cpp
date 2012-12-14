@@ -2,7 +2,7 @@
 #include "tools.h"
 #include "display.h"
 #include <wx/wx.h>
-#include <wx/listctrl.h>
+
 
 BEGIN_EVENT_TABLE(CDisplayPlugin,CNaviDiaplayApi)
     EVT_CONTEXT_MENU(CDisplayPlugin::OnMenu)
@@ -48,6 +48,7 @@ CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& p
 	ArrayOfTypes.Add(_("Sattelites"));
 	ArrayOfTypes.Add(_("Status"));
 	ArrayOfTypes.Add(_("Tracks"));
+	ArrayOfTypes.Add(_("Status"));
 		
 	if(!FileConfig->Read(wxString::Format(_("%s/%s"),Name.wc_str(),_(KEY_CONTROL_TYPE)),&ControlType))
 		ControlType = DEFAULT_CONTROL_TYPE;
@@ -257,6 +258,9 @@ void CDisplayPlugin::Draw(wxGCDC &dc)
 		case ID_TRACKS:
 			DrawTracks(dc);
 		break;
+		case ID_SIGNALS:
+			DrawSignals(dc);
+		break;
 
 	}
 }
@@ -303,6 +307,71 @@ void CDisplayPlugin::DrawData(wxGCDC &dc, wxString caption, wxString text)
 	IsDrawning = false;
 	
 }
+
+void CDisplayPlugin::DrawSignals(wxGCDC &dc)
+{
+	
+	if(Panel == NULL)
+	{
+		
+		wxBoxSizer *MainSizer = new wxBoxSizer(wxHORIZONTAL);
+		Panel = new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
+		wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
+		
+		List = new wxListCtrl(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxLC_REPORT);
+		List->InsertColumn(0,_("Signal"));
+		List->InsertColumn(0,_("Count"));
+		PanelSizer->Add(List,1,wxALL|wxEXPAND,5);
+
+		MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
+		Panel->SetSizer(PanelSizer);
+
+		//wxBoxSizer *Panel1Sizer = new wxBoxSizer(wxVERTICAL);
+		//wxPanel *Panel1 = new wxPanel(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
+		//PanelSizer->Add(Panel1,0,wxALL|wxEXPAND,5);
+			
+		this->SetSizer(MainSizer);
+		Panel->SetSize(GetWidth(),GetHeight());
+	}	
+	
+	
+	if(MapPlugin != NULL)
+	{			
+		CMySerial *Serial = MapPlugin->GetMySerial();
+		if(Serial == NULL)
+			return;
+
+		static int counter;
+
+		if(counter == Serial->GetSignalCount())
+			return;
+				
+		counter = Serial->GetSignalCount();
+				
+		for(size_t i = 0; i < Serial->GetSignalCount(); i++)
+		{	
+			wxListItem item;
+			wxString sig((char*)Serial->GetSignal(i)->name,wxConvUTF8);
+			item.SetText(sig);
+			item.SetMask(wxLIST_MASK_TEXT);
+			item.SetColumn(0);
+			List->InsertItem(item);
+
+
+			wxString nmea((char*)Serial->GetSignal(i)->nmea,wxConvUTF8);
+			item.SetText(nmea);
+			item.SetMask(wxLIST_MASK_TEXT);
+			//item.SetColumn(1);
+			List->InsertItem(item);
+		
+		}
+			
+	}		
+	
+}
+
+
+
 void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 {
 	

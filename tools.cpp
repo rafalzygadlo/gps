@@ -3,6 +3,35 @@
 #include <wx/stdpaths.h>
 
 
+int GlobalLanguageID;
+const wxChar *nvLanguage[2][20] = 
+{ 
+	/*EN*/
+	{
+		_("Connect"),
+		_("Disconnect"),
+		_("Port scanning on demand.\nWe do not check the available ports automatically because for some devices such as bluetooth,\nit takes a long time and it looks as if the program has crashed.\nThat's why we provide manual search for ports."),
+		_("Scan for available ports"),
+		_("Ok"),
+		_("Show Log Window"),
+		_("Scaning ports. Please wait."),
+		
+	},
+	
+	/*PL*/
+	{
+		_("Abc"),
+
+	}
+
+};
+
+wxString GetMsg(int id)
+{
+	return nvLanguage[GlobalLanguageID][id];
+}
+
+
 double DD( float DM ) 
 {
 

@@ -53,14 +53,16 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	Track = new CTrack();
 	TrackList = new CTrackList();
 	TrackList->AddTrack(Track);
-	GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
+	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
-	AddExecuteFunction("gps_SetExit", SetExit);
+//	AddExecuteFunction("gps_SetExit", SetExit);
 	AddExecuteFunction("gps_SetNMEAInfo",SetNMEAInfo);
 	AddExecuteFunction("gps_SetLog",SetLog);
-	AddExecuteFunction("gps_SetPort",SetPort);
-	AddExecuteFunction("gps_SetBaud",SetBaud);
+	AddExecuteFunction("gps_NewSignal",NewSignal);
+
+//	AddExecuteFunction("gps_SetPort",SetPort);
+//	AddExecuteFunction("gps_SetBaud",SetBaud);
 }
 
 CMapPlugin::~CMapPlugin()
@@ -85,16 +87,21 @@ CTrackList *CMapPlugin::GetTrackList()
 void CMapPlugin::WriteConfig()
 {
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
-//	FileConfig->Write(_(KEY_PORT_INDEX),MySerial->GetPortIndex());
-//	FileConfig->Write(_(KEY_BAUD_INDEX),MySerial->GetBaudIndex());
+			
+	bool running = MySerial->IsRunning();
+	wxString port(MySerial->GetPortName(),wxConvUTF8);
+	int baud = MySerial->GetBaudRate();
+	
+	FileConfig->Write(_(KEY_PORT),port);
+	FileConfig->Write(_(KEY_BAUD),baud);
+	FileConfig->Write(_(KEY_RUNNING),running);
+	
 	delete FileConfig;
 }
 
 void CMapPlugin::CreateSumbols(void) 
 {
-
 	TMemoryBlock AnimMarker;
-
 	AnimMarker.Ptr = animpos;
 	AnimMarker.Size = animpos_size;
 	TextureAnimMarker = LoadFromMemoryBlockTGA( &AnimMarker );
@@ -102,7 +109,6 @@ void CMapPlugin::CreateSumbols(void)
 
 void CMapPlugin::CreateTexture(TTexture *Texture, GLuint *TextureID) 
 {
-
 	glGenTextures(1, TextureID );
 	glBindTexture(GL_TEXTURE_2D, *TextureID );
 	glTexImage2D(GL_TEXTURE_2D, 0, Texture->Bpp / 8, Texture->Width, Texture->Height, 0, Texture->Type, GL_UNSIGNED_BYTE, Texture->Data );
@@ -118,7 +124,6 @@ CMySerial *CMapPlugin::GetMySerial()
 
 void CMapPlugin::CreateTextures(void) 
 {
-	
 	CreateTexture( TextureAnimMarker,  &AnimMarkerID );
 	TexturesCreated = true;
 }
@@ -136,24 +141,39 @@ CNaviBroker *CMapPlugin::GetBroker()
 
 void CMapPlugin::Run(void *Params)
 {
-    fprintf(stderr,"Loading GPS plugin.");
+    
     MyFrame = NULL;
     MySerial = new CMySerial(Broker);
 	    
-    int	baud = MySerial->GetBaudRate();
 	ConfigPath = wxString::Format(wxT("%s%s"),GetWorkDir().wc_str(),_(PLUGIN_CONFIG_FILE));
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	
-    int port_index;
-	FileConfig->Read(_(KEY_PORT_INDEX), &port_index);
-	MySerial->SetPort("COM1");
+    wxString port;
+		
+	bool exists = true;
+	if(!FileConfig->Exists(_(KEY_PORT)))
+		exists = false;
 
-	int baud_index;
-	FileConfig->Read(_(KEY_BAUD_INDEX), &baud_index);
-	MySerial->SetBaud(4800);
+	if(!FileConfig->Exists(_(KEY_BAUD)))
+		exists = false;
 
-    MySerial->Start();
+	
+	if(exists)
+	{	
+		FileConfig->Read(_(KEY_PORT), &port);
+		MySerial->SetPort(port.char_str());
 
+		int baud;
+		FileConfig->Read(_(KEY_BAUD), &baud);
+		MySerial->SetBaud(baud);
+
+		bool running;
+		FileConfig->Read(_(KEY_RUNNING), &running);
+		if(running)
+			MySerial->Start();
+	}
+
+	delete FileConfig;
 
 }
 
@@ -167,21 +187,12 @@ void CMapPlugin::Kill(void)
 
 	IsWorking = false;
 	NeedExit = true;
-   
-    if(MySerial != NULL)
-		MySerial->Stop();	// stop the serial port thread
-	
-	
-	while(!_Exit)
-	{	
-		Sleep(500);
-	}
-    
-    if(FileConfig !=NULL)
-        delete FileConfig;
-	
-	// before myserial delete
 	WriteConfig();
+    
+	
+	if(MySerial != NULL)
+		MySerial->Stop();	// stop the serial port thread
+		
 	if(MySerial != NULL)
 		delete MySerial;
 	
@@ -232,13 +243,13 @@ void CMapPlugin::Config()
 
 }
 
-void *CMapPlugin::SetExit(void *NaviMapIOApiPtr, void *Params)
-{
-	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
-	ThisPtr->SetExitFunc((bool)Params);
+//void *CMapPlugin::SetExit(void *NaviMapIOApiPtr, void *Params)
+//{
+	//CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	//ThisPtr->SetExitFunc((bool)Params);
 		
-	return NULL;
-}
+	//return NULL;
+//}
 
 void CMapPlugin::SetExitFunc(bool exit)
 {
@@ -306,42 +317,59 @@ void CMapPlugin::SetLogFunc(char *text)
 	
 }
 
-void *CMapPlugin::SetPort(void *NaviMapIOApiPtr, void *Params)
+void *CMapPlugin::NewSignal(void *NaviMapIOApiPtr, void *Params)
 {
 
 	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
-	ThisPtr->SetPortFunc((char*)Params);
+	ThisPtr->NewSignalFunc();
 		
 	return NULL;
 }
 
-void CMapPlugin::SetPortFunc(char *port) 
+void CMapPlugin::NewSignalFunc() 
 {
-	if(MyFrame == NULL)
-		return;
-	
-	wxString buffer(port,wxConvUTF8);
-	MyFrame->SetPortEvent(buffer);
+
+	SendDisplaySignal(this);
 	
 }
 
-void *CMapPlugin::SetBaud(void *NaviMapIOApiPtr, void *Params)
-{
 
-	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
-	ThisPtr->SetBaudFunc((int)Params);
+//void *CMapPlugin::SetPort(void *NaviMapIOApiPtr, void *Params)
+//{
+
+	//CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	//ThisPtr->SetPortFunc((char*)Params);
 		
-	return NULL;
-}
+	//return NULL;
+//}
 
-void CMapPlugin::SetBaudFunc(int baud) 
-{
-	if(MyFrame == NULL)
-		return;
+//void CMapPlugin::SetPortFunc(char *port) 
+//{
+	//if(MyFrame == NULL)
+		//return;
 	
-	MyFrame->SetBaudEvent(wxString::Format(_("%d"),baud));
+	//wxString buffer(port,wxConvUTF8);
+	//MyFrame->SetPortEvent(buffer);
 	
-}
+//}
+
+//void *CMapPlugin::SetBaud(void *NaviMapIOApiPtr, void *Params)
+//{
+
+	//CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	//ThisPtr->SetBaudFunc((int)Params);
+		
+	//return NULL;
+//}
+
+//void CMapPlugin::SetBaudFunc(int baud) 
+//{
+	//if(MyFrame == NULL)
+		//return;
+	
+	//MyFrame->SetBaudEvent(wxString::Format(_("%d"),baud));
+	
+//}
 
 void CMapPlugin::BuildGeometry()
 {
@@ -642,7 +670,7 @@ void CMapPlugin::Render(void)
 	if(_MouseOverIcon)
 		RenderSelection();
         
-	RenderAnimation();	
+	//RenderAnimation();	
 	RenderMouseXY();
 	//RenderTracks();
 		

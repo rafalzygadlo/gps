@@ -29,12 +29,8 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 
 #define KEY_PORT			"port"
 #define KEY_BAUD			"baud"
-#define KEY_PORT_INDEX		"pindex"
-#define KEY_BAUD_INDEX		"bindex"
-#define KEY_AUTO			"auto"
 #define KEY_CHECK_LOG		"log"
-#define KEY_CHECK_HINT		"hint"
-#define KEY_AREA_SIZE		"size"
+#define KEY_RUNNING			"running"
 
 #define MIN_RECT_HEIGHT 100		// minimalna wysokoœc zaznaczenia
 #define MIN_RECT_WIDTH 100		// minimalna szerokoœæ zaznaczenia
@@ -59,12 +55,18 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
 
 // messages
-#define MSG_0 "Not valid GPS signal"
-#define MSG_1 "Searching on Port: %s BaudRate: %d \n"
-#define MSG_2 "Found GPS signal on Port: %d BaudRate: %d"
-#define MSG_3 "Searching mode"
-#define MSG_4 "Gps Fix: %d"
-#define MSG_5 "\nChecking system ports\n"
+#define MSG_CONNECT					0
+#define MSG_DISCONNECT				1
+#define MSG_PORT_INFO				2
+#define MSG_SCAN					3
+#define MSG_CLOSE					4
+#define MSG_SHOW_LOG				5
+#define MSG_SCANNING_PORTS			6
+#define MSG_GPS_CONFIG_NOT_EXISTS	7
+#define MSG_PORT					8
+#define MSG_BAUD					9
+
+
 
 #define nvPI 3.1415926535897932384626433832795
 #define ID_MENU_BEGIN 1000

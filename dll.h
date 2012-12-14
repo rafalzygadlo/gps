@@ -95,7 +95,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void SetLogFunc(char *text);
 	void SendDisplaySignal(CMapPlugin *MapPlugin);
 	void SetPortFunc(char *port);
-	void SetBaudFunc(int baud);
+	//void SetBaudFunc(int baud);
 	void RenderMouseXY();
 					
 public:
@@ -116,6 +116,7 @@ public:
 	void SetShowHint(bool show);
 	void AddPoint(double x, double y, nmeaINFO *info);
 	void SetExitFunc(bool exit);
+	void NewSignalFunc();
 	CTrackList *GetTrackList();
 	nmeaINFO GetNmeaINFO();
 	CMySerial *GetMySerial();
@@ -130,11 +131,12 @@ public:
 	virtual void MouseDBLClick(int x, int y);
 		
 	// funkcje dostêpne dla innych pluginów
-	static void *SetExit(void *NaviMapIOApiPtr, void *Params);			// serial port ustawia flagê zakoñczenia dzia³ania
+	//static void *SetExit(void *NaviMapIOApiPtr, void *Params);			// serial port ustawia flagê zakoñczenia dzia³ania
 	static void *SetNMEAInfo(void *NaviMapIOApiPtr, void *Params);
-	static void *SetLog(void *NaviMapIOApiPtr, void *Params);			// ustawia log w okienku konfiguracyjnym
-	static void *SetPort(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
-	static void *SetBaud(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
+	static void *SetLog(void *NaviMapIOApiPtr, void *Params);				// ustawia log w okienku konfiguracyjnym
+	static void *NewSignal(void *NaviMapIOApiPtr, void *Params);
+	//static void *SetPort(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
+	//static void *SetBaud(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
 };	
 
 #ifdef __cplusplus
