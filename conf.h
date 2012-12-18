@@ -52,7 +52,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define AREA_MAXX	8
 #define AREA_MAXY	9
 
-#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
+//#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
 
 // messages
 #define MSG_CONNECT					0
@@ -65,7 +65,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_GPS_CONFIG_NOT_EXISTS	7
 #define MSG_PORT					8
 #define MSG_BAUD					9
-
+#define MSG_SIGNALS_INFO			10
 
 
 #define nvPI 3.1415926535897932384626433832795

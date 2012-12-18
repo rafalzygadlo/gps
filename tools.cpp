@@ -15,6 +15,10 @@ const wxChar *nvLanguage[2][20] =
 		_("Ok"),
 		_("Show Log Window"),
 		_("Scaning ports. Please wait."),
+		_("Gps is not configured. Go to Settings -> GPS."),
+		_("Port"),
+		_("Baud"),
+		_("Show signals"),
 		
 	},
 	

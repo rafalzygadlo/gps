@@ -8,6 +8,7 @@
 #include "NaviMapIOApi.h"
 #include "tools.h"
 #include "info.h"
+#include "status.h"
 
 DEFINE_EVENT_TYPE(nvEVT_SET_LOG)
 DEFINE_EVENT_TYPE(nvEVT_SET_PORT)
@@ -20,7 +21,8 @@ BEGIN_EVENT_TABLE(CMyFrame,wxDialog)
 	EVT_CHECKBOX(ID_CHECK_LOG,CMyFrame::OnCheckLog)
 	EVT_COMBOBOX(ID_PORTS,CMyFrame::OnComboBox)
 	EVT_CLOSE(CMyFrame::OnClose)
-	EVT_HYPERLINK(ID_REFRESH,CMyFrame::OnScanPorts)
+	EVT_HYPERLINK(ID_SCAN,CMyFrame::OnScan)
+	EVT_HYPERLINK(ID_INFO,CMyFrame::OnInfo)
 	EVT_COMMAND(ID_SET_LOG,nvEVT_SET_LOG,CMyFrame::OnSetLog)	//my own defined event
 //	EVT_COMMAND(ID_SET_PORT,nvEVT_SET_PORT,CMyFrame::OnSetPort)	//my own defined event
 	EVT_COMMAND(ID_SET_BAUD,nvEVT_SET_BAUD,CMyFrame::OnSetBaud)	//my own defined event
@@ -75,9 +77,12 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 
 	wxStaticText *ScanInfo = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_PORT_INFO));
 	TopSizer->Add(ScanInfo,0,wxALL|wxEXPAND,5);
-	wxHyperlinkCtrl *Scan = new wxHyperlinkCtrl(Panel,ID_REFRESH,GetMsg(MSG_SCAN),wxEmptyString);
+	Scan = new wxHyperlinkCtrl(Panel,ID_SCAN,GetMsg(MSG_SCAN),wxEmptyString);
 	TopSizer->Add(Scan,0,wxALL,5);
 	
+	Info = new wxHyperlinkCtrl(Panel,ID_INFO,GetMsg(MSG_SIGNALS_INFO),wxEmptyString);
+	TopSizer->Add(Info,0,wxALL,5);
+
 	wxBoxSizer *LeftSizer = new wxBoxSizer(wxHORIZONTAL);
 	CenterSizer->Add(LeftSizer,0,wxALL|wxEXPAND,5);
 		
@@ -94,6 +99,7 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	LogText->SetMinSize(wxSize(-1,200));
 	CenterSizer->Add(LogText,1,wxALL|wxEXPAND,5);
 
+	MySerial = MapPlugin->GetMySerial();
 	
 	if(MapPlugin->GetMySerial() != NULL)
 	{
@@ -102,10 +108,12 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
             StopButton->Enable();
 			PortComboBox->Disable();
 			BaudComboBox->Disable();
+			Scan->Disable();
 		}else{
             StartButton->Enable();
 			PortComboBox->Enable();
 			BaudComboBox->Enable();
+			Scan->Enable();
 		}
 	}
 	
@@ -150,7 +158,7 @@ CMyFrame::~CMyFrame(void)
 	delete FileConfig;
 }
 
-void CMyFrame::OnScanPorts(wxHyperlinkEvent &event)
+void CMyFrame::OnScan(wxHyperlinkEvent &event)
 {
 	wxWindowDisabler();
 	CMyInfo Info(this,GetMsg(MSG_SCANNING_PORTS));
@@ -166,6 +174,14 @@ void CMyFrame::OnScanPorts(wxHyperlinkEvent &event)
 	}
 
 	PortComboBox->SetValue(value);
+
+}
+
+void CMyFrame::OnInfo(wxHyperlinkEvent &event)
+{
+	CStatus *Status = new CStatus(MySerial);
+	Status->ShowModal();
+	delete Status;
 
 }
 
@@ -201,8 +217,8 @@ void CMyFrame::OnStartButton(wxCommandEvent &event)
 	wxString port = PortComboBox->GetValue();
 	wxString baud = BaudComboBox->GetValue();
 	StartButton->Disable();
-//	RefreshPortsList();
 	StopButton->Enable();
+	Scan->Disable();
 	PortComboBox->Disable();
 	BaudComboBox->Disable();
 	PortComboBox->SetValue(port);
@@ -221,11 +237,11 @@ void CMyFrame::OnStopButton(wxCommandEvent &event)
 		return;
 
 	wxString value = PortComboBox->GetValue();
-//	RefreshPortsList();
 	PortComboBox->SetValue(value);
 	StopButton->Disable();
 	PortComboBox->Enable();
 	BaudComboBox->Enable();
+	Scan->Enable();
 	_Stop = true;
 	MapPlugin->GetMySerial()->Stop();
 	StartButton->Enable(true);

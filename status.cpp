@@ -27,20 +27,18 @@ CStatus::CStatus(CMySerial *serial)
 	
 	Panel1->SetSizer(Panel1Sizer);
 		
-	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(400,-1),wxTE_MULTILINE | wxTE_READONLY);
+	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(400,150),wxTE_MULTILINE | wxTE_READONLY);
 	Panel1Sizer->Add(Status,0,wxALL|wxEXPAND,10);
 
 	wxString port(serial->GetPortName(),wxConvUTF8);
 	Status->AppendText(wxString::Format(_("%s: %s\n"),GetMsg(MSG_PORT).wc_str(),port.wc_str()));
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAUD).wc_str(),serial->GetBaudRate()));
-	//Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_IS_CONNECTED),serial->IsConnected()));
-	//Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_IS_RUNNING),serial->IsRunning()));
 		
 
 	for(size_t i = 0; i < serial->GetSignalCount();i++)
 	{
 		wxString name((char*)serial->GetSignal(i)->name,wxConvUTF8);
-		Status->AppendText(wxString::Format(_("%s"),name.wc_str()));
+		Status->AppendText(wxString::Format(_("%s\n"),name.wc_str()));
 	}
 			
 	this->SetSizer(MainSizer);

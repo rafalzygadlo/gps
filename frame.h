@@ -10,6 +10,7 @@
 #include <wx/hyperlink.h>
 #include "NaviMapIOApi.h"
 #include "dll.h"
+#include "serial.h"
 
 
 typedef struct
@@ -40,8 +41,10 @@ class CMyFrame: public wxDialog
 	wxButton *StopButton;
 	wxCheckBox *CheckLogBox,*CheckBoxHint;
 	wxSpinCtrl *Spin;
+	wxHyperlinkCtrl *Scan,*Info;
 	double minX, maxX, minY, maxY;						// gps area
 	double old_data;
+	CMySerial *MySerial;
 
 
 	bool _Start,_Stop , _Close;
@@ -55,11 +58,11 @@ class CMyFrame: public wxDialog
 	void OnComboBox(wxCommandEvent &event);
 	// custom events to send text from thread
 	void OnSetLog(wxCommandEvent &event);
-	//void OnSetPort(wxCommandEvent &event);
-	void OnSetBaud(wxCommandEvent &event);
-	void OnScanPorts(wxHyperlinkEvent &event);
-	void OnInfo(wxHyperlinkEvent &event);
 	
+	void OnSetBaud(wxCommandEvent &event);
+	void OnScan(wxHyperlinkEvent &event);
+	void OnInfo(wxHyperlinkEvent &event);
+		
 
 public:
 
@@ -89,7 +92,7 @@ public:
 		ID_CLOSE,
 		ID_PORTS,
 		ID_CHECK_LOG,
-		ID_REFRESH,
+		ID_SCAN,
 		ID_INFO
 	};
 };

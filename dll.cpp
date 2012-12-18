@@ -50,9 +50,9 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	TexturesCreated = false;
 	CreateSumbols();
 	CreateApiMenu();
-	Track = new CTrack();
-	TrackList = new CTrackList();
-	TrackList->AddTrack(Track);
+	//Track = new CTrack();
+	//TrackList = new CTrackList();
+	//TrackList->AddTrack(Track);
 	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
@@ -68,8 +68,8 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 CMapPlugin::~CMapPlugin()
 {
 	delete DisplaySignal;
-	delete Track;
-	delete TrackList;
+	//delete Track;
+	//delete TrackList;
 	MyFrame = NULL;
 	MySerial = NULL;
 }
@@ -141,6 +141,7 @@ CNaviBroker *CMapPlugin::GetBroker()
 
 void CMapPlugin::Run(void *Params)
 {
+	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
     
     MyFrame = NULL;
     MySerial = new CMySerial(Broker);
@@ -149,7 +150,7 @@ void CMapPlugin::Run(void *Params)
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	
     wxString port;
-		
+			
 	bool exists = true;
 	if(!FileConfig->Exists(_(KEY_PORT)))
 		exists = false;
@@ -443,7 +444,6 @@ bool CMapPlugin::IsPointInsideBox(double px, double py, double bx1, double by1, 
 
 }
 
-
 void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 {
 	
@@ -728,6 +728,5 @@ unsigned char *GetNaviPluginInfoBlock()
 void NAVIMAPAPI FreeNaviClassInstance(void *ptr)
 {
 	delete (CMapPlugin*)ptr;
-	_CrtDumpMemoryLeaks();
 }
 
