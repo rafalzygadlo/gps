@@ -6,6 +6,7 @@
 #include <vector>
 #include <wx/wx.h>
 #include "NaviDisplayApi.h"
+#include "NaviFont.h"
 
 #include <wx/fileconf.h>
 
@@ -46,6 +47,7 @@ class CMapPlugin :public CNaviMapIOApi
 	CNaviBroker *Broker;
 	CTrack *Track;
 	CTrackList *TrackList;
+	CNaviPixmapFont *Font;
 	bool NeedExit;
 	bool IsData;
 	bool _Exit;
@@ -97,6 +99,9 @@ class CMapPlugin :public CNaviMapIOApi
 	void SetPortFunc(char *port);
 	//void SetBaudFunc(int baud);
 	void RenderMouseXY();
+	void RenderDistance();
+	float RenderText(double x, double y, wchar_t *text);
+	float RenderText(double x, double y, char *text);
 					
 public:
 

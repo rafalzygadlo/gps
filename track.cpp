@@ -52,7 +52,9 @@ void CTrack::LoadFromFile(wxString filename)
 			memset(buffer,0,sizeof(SPointInfo));
 			while(!file.Eof())
 			{	
-				file.Read(buffer,sizeof(SPointInfo));
+				file.Read(&buffer->x,sizeof(double));
+				file.Read(&buffer->y,sizeof(double));
+				file.Read(buffer,sizeof(nmeaINFO));
 				AddPoint(buffer->x,buffer->y);
 				AddPointInfo(buffer->x,buffer->y,&buffer->nmea_info);
 			}
@@ -76,8 +78,12 @@ void CTrack::SaveToFile()
 		if(file.Open(wxString::Format(_("%s"),filename),wxFile::write))
 		{
 			file.Write(&Header,sizeof(STrackHeader));
-			for(unsigned int i = 0; i < vPointInfo.size();i++)	
-				file.Write(&vPointInfo[i],sizeof(vPointInfo));
+			for(unsigned int i = 0; i < vPointInfo.size();i++)
+			{	
+				file.Write(&vPointInfo[i].x,sizeof(double));
+				file.Write(&vPointInfo[i].y,sizeof(double));
+				file.Write(&vPointInfo[i].nmea_info,sizeof(nmeaINFO));
+			}
 		}
 		
 		file.Close();
@@ -139,7 +145,6 @@ void CTrackList::AddTrack(CTrack *track)
 
 void CTrackList::LoadTracks()
 {
-	
 	wxDir dir(GetWorkDir());
 
     if(!dir.IsOpened())

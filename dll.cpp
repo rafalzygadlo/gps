@@ -50,9 +50,9 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	TexturesCreated = false;
 	CreateSumbols();
 	CreateApiMenu();
-	//Track = new CTrack();
-	//TrackList = new CTrackList();
-	//TrackList->AddTrack(Track);
+	Track = new CTrack();
+	TrackList = new CTrackList();
+	TrackList->AddTrack(Track);
 	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
@@ -68,7 +68,7 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 CMapPlugin::~CMapPlugin()
 {
 	delete DisplaySignal;
-	//delete Track;
+	delete Track;
 	//delete TrackList;
 	MyFrame = NULL;
 	MySerial = NULL;
@@ -143,6 +143,17 @@ void CMapPlugin::Run(void *Params)
 {
 	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
     
+	/*
+	wxString fontFile(FONT_NAME,wxConvUTF8);
+	if(!wxFileExists(fontFile))
+	{
+		wxLogError(wxString::Format(GetMsg(MSG_FONT_NOT_EXISTS),FONT_NAME));
+		FreeNaviClassInstance(this);
+		return;
+	}
+	*/
+	
+	//Font = new CNaviPixmapFont(FONT_NAME,FONT_SIZE);
     MyFrame = NULL;
     MySerial = new CMySerial(Broker);
 	    
@@ -395,7 +406,7 @@ void CMapPlugin::BuildGeometry()
     }
 
 	// third circle
-    Radius = 1.0f;
+    Radius = 2.0f;
 	CircleRadius = Radius;
     for(int i=0; i<360; i+=6)
     {
@@ -409,21 +420,28 @@ void CMapPlugin::BuildGeometry()
     Points.x = -0.3;	Points.y =	0.0;    vLineH.push_back(Points);
     Points.x = 0.3;		Points.y =	0.0;    vLineH.push_back(Points);
     //line V
-    Points.x = 0.0;		Points.y =	0.3;	vLineH.push_back(Points);
-    Points.x = 0.0;		Points.y =	-1.0;   vLineH.push_back(Points);
-	// bok
+    //Points.x = 0.0;		Points.y =	0.3;	vLineH.push_back(Points);
+    //Points.x = 0.0;		Points.y =	0.0;   vLineH.push_back(Points);
+	
+	// bok kat
 	Points.x = 0.0;		Points.y = -1.0;	vLineH.push_back(Points);
-	Points.x = 0.3;		Points.y = 0.0;		vLineH.push_back(Points);
-	// bok
+	Points.x = 0.3;		Points.y = -0.5;	vLineH.push_back(Points);
+	// bok kat
 	Points.x = 0.0;		Points.y = -1.0;	vLineH.push_back(Points);
-	Points.x = -0.3;	Points.y = 0.0;		vLineH.push_back(Points);
-	// end
-    Points.x = -0.3;    Points.y =	0.3;    vLineH.push_back(Points);
-    Points.x = 0.3;		Points.y =	0.3;    vLineH.push_back(Points);
-	// end1
-	Points.x = -0.2;    Points.y =	0.5;    vLineH.push_back(Points);
-    Points.x = 0.2;		Points.y =	0.5;    vLineH.push_back(Points);
+	Points.x = -0.3;	Points.y = -0.5;	vLineH.push_back(Points);
+	
+	// bok
+	Points.x = 0.3;		Points.y = -0.5;	vLineH.push_back(Points);
+	Points.x = 0.3;		Points.y = 1.0;		vLineH.push_back(Points);
+	// bok 
+	Points.x = -0.3;	Points.y = -0.5;	vLineH.push_back(Points);
+	Points.x = -0.3;	Points.y = 1.0;		vLineH.push_back(Points);
+	
+	Points.x = -0.3;    Points.y =	1.0;    vLineH.push_back(Points);
+    Points.x = 0.3;		Points.y =	1.0;    vLineH.push_back(Points);
 
+	//Points.x = -0.2;    Points.y =	1.0;    vLineH.push_back(Points);
+    //Points.x = 0.2;		Points.y =	1.0;    vLineH.push_back(Points);
 
 }
 
@@ -462,6 +480,9 @@ void CMapPlugin::Mouse(int x, int y, bool lmb, bool mmb, bool rmb)
 	MouseY = _y;
 	
 	
+	if(_MouseOverIcon)
+		Broker->Refresh(Broker->GetParentPtr());
+
 	if(rmb)
 		return;
 
@@ -535,6 +556,32 @@ double CMapPlugin::GetGpsY()
 	return _Y;
 }
 
+float CMapPlugin::RenderText(double x, double y, wchar_t *text)
+{
+	//if(MapScale < Factor)
+		//return 0;
+
+	float width, height;
+	width = (Font->GetWidth(text)/2)/SmoothScaleFactor;
+	height = (Font->GetHeight()/2)/SmoothScaleFactor;
+	Font->Render(x - width , y - height , text);
+	
+	return height;
+}
+
+float CMapPlugin::RenderText(double x, double y, char *text)
+{
+	//if(MapScale < Factor)
+		//return 0;
+	float width, height;
+	width = (Font->GetWidth(text)/2)/SmoothScaleFactor;
+	height = (Font->GetHeight()/2)/SmoothScaleFactor;
+		
+	Font->Render(x - width , y - height , text);
+
+	return height;
+}
+
 void CMapPlugin::RenderTracks()
 {
 	glEnable(GL_POINT_SMOOTH);
@@ -544,13 +591,13 @@ void CMapPlugin::RenderTracks()
 	for(int i = 0; i < Tracks.size() ;i++)
 	{
 		glColor4f(1.0f,0.0f,0.0f,0.5f);
-		glPointSize(15.0f);
+		glPointSize(5.0f);
 		
 		std::vector<SPoint> pts = Tracks[i]->GetTrackPoints();
 		if(pts.size() > 0)
 		{
-			RenderGeometry(GL_POINTS,&pts[0], pts.size());			// punkty z gpsa
-			RenderGeometry(GL_LINE_LOOP,&pts[0], pts.size());			// linie
+			RenderGeometry(GL_POINTS,&pts[0], pts.size());				// punkty z gpsa
+			RenderGeometry(GL_LINE_STRIP,&pts[0], pts.size());			// linie
 		}
     }
 	
@@ -573,8 +620,10 @@ void CMapPlugin::RenderSelection()
 			glVertex2f(vCircle3[45].x,vCircle3[45].y);
 		glEnd();
     glPopMatrix();
-
+			
 }
+
+
 
 void CMapPlugin::RenderPosition()
 {
@@ -585,7 +634,6 @@ void CMapPlugin::RenderPosition()
 	
 	if(GpsX == GPS_OUT_OF_COORDS || GpsY == GPS_OUT_OF_COORDS)
 		return;
-		
 		
 	glColor4f(0.0f,0.0f,1.0f,0.5f);
 	glPushMatrix();
@@ -633,30 +681,49 @@ void CMapPlugin::RenderAnimation()
 	glDisable(GL_TEXTURE_2D);	
 		
 	AnimMarkerSize += 10.0f;
-	if( AnimMarkerSize > 500.0f )
-		AnimMarkerSize = 100.0f;
+	if( AnimMarkerSize > 200.0f )
+		AnimMarkerSize = 50.0f;
 
 }
+
 void CMapPlugin::RenderMouseXY()
 {
 	glPointSize(10);
 	glColor3f(1.0,0.0,0.0);
 	
-	glBegin(GL_POINTS);
+	glBegin(GL_LINES);
 		glVertex2d(MouseX,MouseY);
+		glVertex2d(GpsX,GpsY);
 	glEnd();
 	
 	glPointSize(1);
 }
 
+void CMapPlugin::RenderDistance()
+{
+
+	double v1,v2, _x1,_y1, _x2, _y2;
+	wchar_t val[10];
+	Broker->Project(GpsX,GpsY,&_x1,&_y1);
+	Broker->Project(MouseX,MouseY,&_x2,&_y2);
+	swprintf(val,L"%4.4f",nvDistance(_x1,_y1,_x2,_y2,nvNauticMiles));
+	
+	nvMidPoint(GpsX,GpsY,MouseX,MouseY,&v1,&v2);
+		
+	glPushMatrix();
+	glTranslatef(v1 ,v2 ,0.0f);
+	glScalef(0.5/Scale,0.5/Scale,0.0f);
+	Broker->Print(Broker->GetParentPtr(),0.0f,0.0f,val);
+	glPopMatrix();
+
+}
 
 void CMapPlugin::Render(void)
 {
 	
 	if( GetNeedExit())
         return;
-	
-	
+		
 	Scale = Broker->GetMapScale();
 		
     glEnable(GL_LINE_SMOOTH);
@@ -668,11 +735,14 @@ void CMapPlugin::Render(void)
 	RenderPosition();
     
 	if(_MouseOverIcon)
+	{
 		RenderSelection();
+		RenderMouseXY();
+		RenderDistance();
+	}
         
 	//RenderAnimation();	
-	RenderMouseXY();
-	//RenderTracks();
+	RenderTracks();
 		
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);
@@ -686,7 +756,7 @@ void CMapPlugin::Render(void)
 void NAVIMAPAPI *CreateNaviClassInstance(CNaviBroker *NaviBroker)
 {
    CMapPlugin *DLL = new CMapPlugin(NaviBroker);
-    return (void*) ( DLL );
+   return (void*) ( DLL );
 }
 
 const NAVIMAPAPI wchar_t *NaviPluginDescription(int LangID)

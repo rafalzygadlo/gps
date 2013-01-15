@@ -52,7 +52,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define AREA_MAXX	8
 #define AREA_MAXY	9
 
-//#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
+#define BUILD_GPS_POINTS_VECTOR			// czy ma budowaæ listê punktów
 
 // messages
 #define MSG_CONNECT					0
@@ -66,6 +66,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_PORT					8
 #define MSG_BAUD					9
 #define MSG_SIGNALS_INFO			10
+#define MSG_FONT_NOT_EXISTS			11
 
 
 #define nvPI 3.1415926535897932384626433832795
@@ -116,12 +117,21 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 
 
 #define TRACK_FILE_EXTENSION "track"
-
 #define NOT_AVAILABLE "N/A"
-
 #define SIGNAL_SET_NMEA_INFO 		0x00001
 
+enum nvDistanceUnits { nvDefault, nvKilometer, nvNauticMiles, nvMeter };
+#define NV_PI 3.1415926535897932384626433
 
+#if defined(_LINUX32) || defined(_LINUX64)
+	#define FONT_NAME "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
+#endif
+
+#if defined(_WIN32) || defined(_WIN64)
+	#define FONT_NAME "arial.ttf"
+#endif
+
+#define FONT_SIZE 14
 
 typedef struct
 {
