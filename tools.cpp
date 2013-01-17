@@ -20,6 +20,10 @@ const wxChar *nvLanguage[2][20] =
 		_("Baud"),
 		_("Show signals"),
 		_("Font %s not found in program folder.\nCopy font file to the program folder and start plugin again."),
+		_("Distance unit"),
+		_("Ok"),
+		_("Cancel"),
+		_("Alarm configuration")
 		
 	},
 	
@@ -30,6 +34,64 @@ const wxChar *nvLanguage[2][20] =
 	}
 
 };
+
+const wxChar *nvDistanceN[2][3] = 
+{ 
+	//en
+	{
+		_("Nautic Miles"),
+		_("Kilometer"),
+		_("Meter"),
+	},
+
+	//pl
+	{
+		_("Mile morskie"),
+		_("Kilometry"),
+		_("Metry"),
+	}
+
+};
+
+
+const wxChar *nvDistanceU[2][3] = 
+{ 
+	//en
+	{
+		_("NM"),
+		_("km"),
+		_("m"),
+	},
+
+	//pl
+	{
+		_("NM"),
+		_("km"),
+		_("m"),
+	}
+
+};
+
+wxString GetProductInfo()
+{
+	return wxString::Format(_("%s %s\n%s"),_(PRODUCT_NAME),_(PRODUCT_VERSION),_(PRODUCT_COPYRIGHT));
+}
+wxString GetProductName()
+{
+	return wxString::Format(_("%s %s"),_(PRODUCT_NAME),_(PRODUCT_VERSION));
+}
+
+
+wxString GetDistanceName(size_t id)
+{
+	return nvDistanceN[GlobalLanguageID][id];
+}
+
+wxString GetDistanceUnit(size_t id)
+{
+	return nvDistanceU[GlobalLanguageID][id];
+}
+
 
 wxString GetMsg(int id)
 {
@@ -155,7 +217,7 @@ void nvMidPoint(double lon1, double lat1,double lon2, double lat2, double *v1, d
 	*v2 = (lat1 + lat2) / 2;
 }
 
-double nvDistance(double lon1, double lat1, double lon2, double lat2, nvDistanceUnits distanceunit) 
+double nvDistance(double lon1, double lat1, double lon2, double lat2, size_t distanceunit) 
 {
 
 	double dLat = nvToRad( lat2 - lat1 );
@@ -168,9 +230,10 @@ double nvDistance(double lon1, double lat1, double lon2, double lat2, nvDistance
 	switch( distanceunit ) {
 
 	case nvKilometer: return R * c;
-	case nvNauticMiles: return (R *c) / 1.852;
-	default:
-		return c;
+		case nvNauticMiles: return (R *c) / 1.852;
+		case nvMeter : return R * c * 1000;
+		default:
+			return (R *c) / 1.852;
 
 	}
 }

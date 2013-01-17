@@ -30,6 +30,7 @@ unsigned char pib[] =
 wxMutex mutex;
 CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 {
+	ConfigPath = wxString::Format(wxT("%s%s"),GetWorkDir().wc_str(),_(PLUGIN_CONFIG_FILE));
 	GpsX = GpsY = _X = _Y = _UX = _UY = GPS_OUT_OF_COORDS;
 	DisplaySignal = new CDisplaySignal(NDS_GPS);
 	nmea_zero_INFO(&NmeaInfo);
@@ -53,6 +54,8 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	Track = new CTrack();
 	TrackList = new CTrackList();
 	TrackList->AddTrack(Track);
+	DistanceUnit = 0;
+	ReadConfig();
 	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
@@ -60,6 +63,7 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	AddExecuteFunction("gps_SetNMEAInfo",SetNMEAInfo);
 	AddExecuteFunction("gps_SetLog",SetLog);
 	AddExecuteFunction("gps_NewSignal",NewSignal);
+	AddExecuteFunction("gps_NoSignal",NoSignal);
 
 //	AddExecuteFunction("gps_SetPort",SetPort);
 //	AddExecuteFunction("gps_SetBaud",SetBaud);
@@ -70,6 +74,7 @@ CMapPlugin::~CMapPlugin()
 	delete DisplaySignal;
 	delete Track;
 	//delete TrackList;
+	delete MyFrame;
 	MyFrame = NULL;
 	MySerial = NULL;
 }
@@ -84,9 +89,18 @@ CTrackList *CMapPlugin::GetTrackList()
 	return TrackList;
 }
 
+void CMapPlugin::ReadConfig()
+{
+	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
+	FileConfig->Read(_(KEY_DISTANCE_UNIT), &DistanceUnit,nvNauticMiles);
+	delete FileConfig;
+
+}
+
 void CMapPlugin::WriteConfig()
 {
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
+	FileConfig->Write(_(KEY_DISTANCE_UNIT), DistanceUnit);
 			
 	bool running = MySerial->IsRunning();
 	wxString port(MySerial->GetPortName(),wxConvUTF8);
@@ -157,7 +171,7 @@ void CMapPlugin::Run(void *Params)
     MyFrame = NULL;
     MySerial = new CMySerial(Broker);
 	    
-	ConfigPath = wxString::Format(wxT("%s%s"),GetWorkDir().wc_str(),_(PLUGIN_CONFIG_FILE));
+	
 	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	
     wxString port;
@@ -241,16 +255,17 @@ void CMapPlugin::Config()
 		return;
 
 #if defined(_WIN32) || defined(_WIN64)
-	MyFrame = new CMyFrame(this);
-    MyFrame->ShowModal();
-    MyFrame->Close();
-	MyFrame = NULL;
+	if(MyFrame == NULL)
+		MyFrame = new CMyFrame(this);
+	if(MyFrame->IsModal())
+		MyFrame->Show();
+	else
+		MyFrame->ShowModal();
 #endif
 #if defined (_LINUX32) || defined(_LINUX64)
     MyFrame = new CMyFrame();
     MyFrame->ShowModal();
-    MyFrame->Close();
-	MyFrame = NULL;
+    MyFrame = NULL;
 #endif
 
 }
@@ -344,6 +359,21 @@ void CMapPlugin::NewSignalFunc()
 	SendDisplaySignal(this);
 	
 }
+
+void *CMapPlugin::NoSignal(void *NaviMapIOApiPtr, void *Params)
+{
+
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	ThisPtr->NewSignalFunc();
+		
+	return NULL;
+}
+
+void CMapPlugin::NoSignalFunc()
+{
+		
+}
+
 
 
 //void *CMapPlugin::SetPort(void *NaviMapIOApiPtr, void *Params)
@@ -536,14 +566,25 @@ void CMapPlugin::MouseDBLClick(int x, int y)
 		Config();
 }
 
+size_t CMapPlugin::GetUnit()
+{
+	return DistanceUnit;
+}
+
+void CMapPlugin::SetUnit(size_t val)
+{
+	DistanceUnit = val;
+}
 
 void CMapPlugin::AddPoint(double x, double y, nmeaINFO *info)
 {
 
+	mutex.Lock();
 #ifdef BUILD_GPS_POINTS_VECTOR
 	Track->AddPoint(x,y);
 	Track->AddPointInfo(x,y,info);
 #endif
+	mutex.Unlock();
 
 }
 double CMapPlugin::GetGpsX()
@@ -586,6 +627,7 @@ void CMapPlugin::RenderTracks()
 {
 	glEnable(GL_POINT_SMOOTH);
 	
+	mutex.Lock();
 	std::vector<CTrack*> Tracks = TrackList->GetList();
 	
 	for(int i = 0; i < Tracks.size() ;i++)
@@ -600,6 +642,8 @@ void CMapPlugin::RenderTracks()
 			RenderGeometry(GL_LINE_STRIP,&pts[0], pts.size());			// linie
 		}
     }
+	
+	mutex.Unlock();
 	
 	glDisable(GL_POINT_SMOOTH);
 
@@ -703,16 +747,16 @@ void CMapPlugin::RenderDistance()
 {
 
 	double v1,v2, _x1,_y1, _x2, _y2;
-	wchar_t val[10];
+	wchar_t val[32];
 	Broker->Project(GpsX,GpsY,&_x1,&_y1);
 	Broker->Project(MouseX,MouseY,&_x2,&_y2);
-	swprintf(val,L"%4.4f",nvDistance(_x1,_y1,_x2,_y2,nvNauticMiles));
+	swprintf(val,L"%4.4f %s",nvDistance(_x1,_y1,_x2,_y2,DistanceUnit),GetDistanceUnit(DistanceUnit));
 	
 	nvMidPoint(GpsX,GpsY,MouseX,MouseY,&v1,&v2);
 		
 	glPushMatrix();
 	glTranslatef(v1 ,v2 ,0.0f);
-	glScalef(0.5/Scale,0.5/Scale,0.0f);
+	glScalef(0.6/Scale,0.6/Scale,0.0f);
 	Broker->Print(Broker->GetParentPtr(),0.0f,0.0f,val);
 	glPopMatrix();
 

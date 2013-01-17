@@ -67,6 +67,11 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_BAUD					9
 #define MSG_SIGNALS_INFO			10
 #define MSG_FONT_NOT_EXISTS			11
+#define MSG_DISTANCE_UNITS			12
+#define MSG_OK						13
+#define MSG_CANCEL					14
+#define MSG_ALARM_CONFIG			15
+
 
 
 #define nvPI 3.1415926535897932384626433832795
@@ -81,6 +86,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define KEY_CONTROL_PRECISION "precision"
 #define KEY_CONTROL_TYPE "control_type"
 #define KEY_FORMAT_TYPE	"format_type"
+#define KEY_DISTANCE_UNIT "distance_unit"
 
 #define SPEED_KNOT 0
 #define SPEED_KMH 1
@@ -120,18 +126,10 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define NOT_AVAILABLE "N/A"
 #define SIGNAL_SET_NMEA_INFO 		0x00001
 
-enum nvDistanceUnits { nvDefault, nvKilometer, nvNauticMiles, nvMeter };
+
 #define NV_PI 3.1415926535897932384626433
+enum nvDistanceUnits { nvNauticMiles, nvKilometer, nvMeter, nvDistanceSize = 3 };
 
-#if defined(_LINUX32) || defined(_LINUX64)
-	#define FONT_NAME "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
-#endif
-
-#if defined(_WIN32) || defined(_WIN64)
-	#define FONT_NAME "arial.ttf"
-#endif
-
-#define FONT_SIZE 14
 
 typedef struct
 {

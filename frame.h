@@ -45,16 +45,15 @@ class CMyFrame: public wxDialog
 	double minX, maxX, minY, maxY;						// gps area
 	double old_data;
 	CMySerial *MySerial;
+	size_t Unit;
 
 
 	bool _Start,_Stop , _Close;
 	void OnStartButton(wxCommandEvent &event);			// start button click
 	void OnStopButton(wxCommandEvent &event);			// stop button click
-	void OnCloseButton(wxCommandEvent &event);			// close click
 	void OnPortComboChange(wxCommandEvent &event);		// combo box changed
 	void OnCheckLog(wxCommandEvent &event);				// check box log
 	
-	void OnClose(wxCloseEvent &event);
 	void OnComboBox(wxCommandEvent &event);
 	// custom events to send text from thread
 	void OnSetLog(wxCommandEvent &event);
@@ -62,7 +61,7 @@ class CMyFrame: public wxDialog
 	void OnSetBaud(wxCommandEvent &event);
 	void OnScan(wxHyperlinkEvent &event);
 	void OnInfo(wxHyperlinkEvent &event);
-		
+	void OnUnit(wxHyperlinkEvent &event);
 
 public:
 
@@ -93,7 +92,8 @@ public:
 		ID_PORTS,
 		ID_CHECK_LOG,
 		ID_SCAN,
-		ID_INFO
+		ID_INFO,
+		ID_UNIT
 	};
 };
 

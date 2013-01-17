@@ -124,5 +124,6 @@ void CMySerial::OnLine(unsigned char *line)
 void CMySerial::OnNoSignal()
 {
 	_info.sig = 0;
-	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
+	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
+	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_NoSignal",NULL);
 }

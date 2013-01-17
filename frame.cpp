@@ -1,14 +1,13 @@
+#include <wx/statline.h>
+#include "NaviMapIOApi.h"
 #include "frame.h"
 #include "conf.h"
 #include "dll.h"
 #include "serial.h"
 #include "tools.h"
-#include <wx/statline.h>
-
-#include "NaviMapIOApi.h"
-#include "tools.h"
 #include "info.h"
 #include "status.h"
+#include "unitconfig.h"
 
 DEFINE_EVENT_TYPE(nvEVT_SET_LOG)
 DEFINE_EVENT_TYPE(nvEVT_SET_PORT)
@@ -17,12 +16,11 @@ DEFINE_EVENT_TYPE(nvEVT_SET_BAUD)
 BEGIN_EVENT_TABLE(CMyFrame,wxDialog)
 	EVT_BUTTON(ID_START,CMyFrame::OnStartButton)
 	EVT_BUTTON(ID_STOP,CMyFrame::OnStopButton)
-	EVT_BUTTON(ID_CLOSE,CMyFrame::OnCloseButton)
 	EVT_CHECKBOX(ID_CHECK_LOG,CMyFrame::OnCheckLog)
 	EVT_COMBOBOX(ID_PORTS,CMyFrame::OnComboBox)
-	EVT_CLOSE(CMyFrame::OnClose)
 	EVT_HYPERLINK(ID_SCAN,CMyFrame::OnScan)
 	EVT_HYPERLINK(ID_INFO,CMyFrame::OnInfo)
+	EVT_HYPERLINK(ID_UNIT,CMyFrame::OnUnit)
 	EVT_COMMAND(ID_SET_LOG,nvEVT_SET_LOG,CMyFrame::OnSetLog)	//my own defined event
 //	EVT_COMMAND(ID_SET_PORT,nvEVT_SET_PORT,CMyFrame::OnSetPort)	//my own defined event
 	EVT_COMMAND(ID_SET_BAUD,nvEVT_SET_BAUD,CMyFrame::OnSetBaud)	//my own defined event
@@ -30,8 +28,9 @@ END_EVENT_TABLE()
 
 
 CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
-:wxDialog(NULL, wxID_ANY, _(PRODUCT_NAME), wxDefaultPosition, wxDefaultSize )
+:wxDialog(NULL, wxID_ANY, GetProductName(), wxDefaultPosition, wxDefaultSize )
 {
+	Unit = _MapPlugin->GetUnit();
 	PortSelection = 0;
 	MapPlugin = _MapPlugin;
 	ConfigPath = wxString::Format(wxT("%s%s"),GetWorkDir().wc_str(),_(PLUGIN_CONFIG_FILE));
@@ -80,8 +79,20 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	Scan = new wxHyperlinkCtrl(Panel,ID_SCAN,GetMsg(MSG_SCAN),wxEmptyString);
 	TopSizer->Add(Scan,0,wxALL,5);
 	
+	wxStaticLine *line1 = new wxStaticLine(Panel,wxID_ANY);
+	TopSizer->Add(line1,0,wxALL|wxEXPAND,5);
+
 	Info = new wxHyperlinkCtrl(Panel,ID_INFO,GetMsg(MSG_SIGNALS_INFO),wxEmptyString);
 	TopSizer->Add(Info,0,wxALL,5);
+
+	wxHyperlinkCtrl *Unit = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_DISTANCE_UNITS),wxEmptyString);
+	TopSizer->Add(Unit,0,wxALL,5);
+
+	wxHyperlinkCtrl *Alarm = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_ALARM_CONFIG),wxEmptyString);
+	TopSizer->Add(Alarm,0,wxALL,5);
+
+	wxStaticLine *line2 = new wxStaticLine(Panel,wxID_ANY);
+	TopSizer->Add(line2,0,wxALL|wxEXPAND,5);
 
 	wxBoxSizer *LeftSizer = new wxBoxSizer(wxHORIZONTAL);
 	CenterSizer->Add(LeftSizer,0,wxALL|wxEXPAND,5);
@@ -119,12 +130,12 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	
 	
 	// plugin name
-	wxStaticText *PluginName = new wxStaticText(this,wxID_ANY,wxString::Format(_("%s \n%s"),_(PRODUCT_NAME),_(PRODUCT_COPYRIGHT)));
-	BottomSizer->Add(PluginName,0,wxALL|wxEXPAND,5);
+	wxStaticText *LabelProductInfo = new wxStaticText(this,wxID_ANY,GetProductInfo() ,wxDefaultPosition,wxDefaultSize);
+	BottomSizer->Add(LabelProductInfo,0,wxALL|wxEXPAND,5);
 
 	// button close
 	BottomSizer->AddStretchSpacer(1);
-	wxButton *ButtonClose = new wxButton(this,ID_CLOSE,GetMsg(MSG_CLOSE),wxDefaultPosition,wxDefaultSize);
+	wxButton *ButtonClose = new wxButton(this,wxID_OK,GetMsg(MSG_CLOSE),wxDefaultPosition,wxDefaultSize);
 	BottomSizer->Add(ButtonClose,0,wxALL|wxALIGN_RIGHT,10);
 
 	Panel->SetSizer(PanelSizer);
@@ -185,25 +196,24 @@ void CMyFrame::OnInfo(wxHyperlinkEvent &event)
 
 }
 
+void CMyFrame::OnUnit(wxHyperlinkEvent &event)
+{
+	CUnitConfig *UnitConfig = new CUnitConfig();
+	UnitConfig->SetUnit(Unit);
+	if(UnitConfig->ShowModal() == wxID_OK)
+	{
+		Unit = UnitConfig->GetUnit();
+		MapPlugin->SetUnit(Unit);
+	}
+
+	delete UnitConfig;
+
+}
 
 void CMyFrame::OnComboBox(wxCommandEvent &event)
 {
 	PortSelection = event.GetSelection();
 //	MapPlugin->GetMySerial()->SetPortIndex(event.GetSelection());
-}
-
-void CMyFrame::OnCloseButton(wxCommandEvent &event)
-{
-	_Close = true;
-	//FileConfig->Write(_(KEY_PORT),wxString::Format(_("COM%d"),MapPlugin->GetMySerial()->GetPortName()));
-	//FileConfig->Write(_(KEY_BAUD),MapPlugin->GetMySerial()->GetBaudRate());
-	FileConfig->Flush();
-	Close();
-
-}
-void CMyFrame::OnClose(wxCloseEvent &event)
-{
-	Destroy();
 }
 
 //wxSpinCtrl *CMyFrame::_GetSpin()

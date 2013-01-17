@@ -67,6 +67,7 @@ void CTrack::LoadFromFile(wxString filename)
 
 void CTrack::SaveToFile()
 {
+	return;
 	if(vPointInfo.size() > 0)
 	{
 		wxFile file;

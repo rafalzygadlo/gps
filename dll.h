@@ -80,6 +80,8 @@ class CMapPlugin :public CNaviMapIOApi
 	unsigned char _LineBuffer[BUFFER_LENGTH];	// buffor lini
 	int _LineBufLen;							// d³ugoœæ bufora lini
 
+	int DistanceUnit;
+
 
 	bool IsPointInsideBox(double px, double py, double bx1, double by1, double bx2, double by2); 
 	void FoldLine( unsigned char *Buffer, int BufferLength );
@@ -122,10 +124,13 @@ public:
 	void AddPoint(double x, double y, nmeaINFO *info);
 	void SetExitFunc(bool exit);
 	void NewSignalFunc();
+	void NoSignalFunc();
 	CTrackList *GetTrackList();
 	nmeaINFO GetNmeaINFO();
 	CMySerial *GetMySerial();
 	bool GetIsWorking();
+	size_t GetUnit();
+	void SetUnit(size_t val);
 
 
 	virtual void Run(void *Params);
@@ -136,12 +141,11 @@ public:
 	virtual void MouseDBLClick(int x, int y);
 		
 	// funkcje dostêpne dla innych pluginów
-	//static void *SetExit(void *NaviMapIOApiPtr, void *Params);			// serial port ustawia flagê zakoñczenia dzia³ania
 	static void *SetNMEAInfo(void *NaviMapIOApiPtr, void *Params);
 	static void *SetLog(void *NaviMapIOApiPtr, void *Params);				// ustawia log w okienku konfiguracyjnym
 	static void *NewSignal(void *NaviMapIOApiPtr, void *Params);
-	//static void *SetPort(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
-	//static void *SetBaud(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
+	static void *NoSignal(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
+	
 };	
 
 #ifdef __cplusplus

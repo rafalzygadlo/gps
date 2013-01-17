@@ -8,6 +8,7 @@
 #include "status.h"
 #include "NaviMapIOApi.h"
 #include "conf.h"
+#include "tools.h"
 
 BEGIN_EVENT_TABLE(CStatus,wxDialog)
 	EVT_BUTTON(ID_CLOSE,OnCloseButton)
@@ -15,7 +16,7 @@ END_EVENT_TABLE()
 
 
 CStatus::CStatus(CMySerial *serial)
-	:wxDialog(NULL,wxID_ANY, _(PRODUCT_NAME), wxDefaultPosition, wxDefaultSize )
+	:wxDialog(NULL,wxID_ANY, GetProductName() , wxDefaultPosition, wxDefaultSize )
 {
 	
 	MainSizer = new wxBoxSizer(wxVERTICAL);
@@ -27,18 +28,19 @@ CStatus::CStatus(CMySerial *serial)
 	
 	Panel1->SetSizer(Panel1Sizer);
 		
-	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(400,150),wxTE_MULTILINE | wxTE_READONLY);
-	Panel1Sizer->Add(Status,0,wxALL|wxEXPAND,10);
+	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(500,200),wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
+	Panel1Sizer->Add(Status,0,wxALL|wxEXPAND,0);
 
 	wxString port(serial->GetPortName(),wxConvUTF8);
 	Status->AppendText(wxString::Format(_("%s: %s\n"),GetMsg(MSG_PORT).wc_str(),port.wc_str()));
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAUD).wc_str(),serial->GetBaudRate()));
 		
-
 	for(size_t i = 0; i < serial->GetSignalCount();i++)
 	{
 		wxString name((char*)serial->GetSignal(i)->name,wxConvUTF8);
-		Status->AppendText(wxString::Format(_("%s\n"),name.wc_str()));
+		wxString nmea((char*)serial->GetSignal(i)->nmea,wxConvUTF8);
+		
+		Status->AppendText(wxString::Format(_("%s: %s"),name.wc_str(),nmea.wc_str()));
 	}
 			
 	this->SetSizer(MainSizer);
@@ -46,6 +48,10 @@ CStatus::CStatus(CMySerial *serial)
 	MainSizer->Add(Panel1,1,wxALL|wxEXPAND,0);
 	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
 	MainSizer->Add(ButtonSizer,0,wxALL|wxEXPAND,5);
+	
+	wxStaticText *LabelProductInfo = new wxStaticText(this,wxID_ANY,GetProductInfo() ,wxDefaultPosition,wxDefaultSize);
+	ButtonSizer->Add(LabelProductInfo,0,wxALL|wxEXPAND,5);
+	
 	ButtonSizer->AddStretchSpacer(1);
 	wxButton *ButtonOk = new wxButton(this,wxID_OK,_("Ok"),wxDefaultPosition,wxDefaultSize);
 	ButtonSizer->Add(ButtonOk,0,wxALL|wxALIGN_RIGHT,5);
