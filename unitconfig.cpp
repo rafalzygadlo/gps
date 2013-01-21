@@ -50,6 +50,7 @@ CUnitConfig::CUnitConfig()
 	this->SetSizer(MainSizer);
 
 	GetSizer()->SetSizeHints(this);
+	Center();
 	
 }
 
