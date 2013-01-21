@@ -71,7 +71,9 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_OK						13
 #define MSG_CANCEL					14
 #define MSG_ALARM_CONFIG			15
-
+#define MSG_BOAT_CONFIG				16
+#define MSG_GPS						17
+#define MSG_SETTINGS				18
 
 
 #define nvPI 3.1415926535897932384626433832795
@@ -131,13 +133,15 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 enum nvDistanceUnits { nvNauticMiles, nvKilometer, nvMeter, nvDistanceSize = 3 };
 
 
-typedef struct
+struct SPoint
 {
 	double x;
 	double y;
 
-} SPoint;
+};
 
+
+ 
 typedef struct
 {
 	double x;

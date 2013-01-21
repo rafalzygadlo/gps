@@ -22,6 +22,7 @@
 #include "frame.h"
 #include "serial.h"
 #include "conf.h"
+#include "boat.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,6 +35,7 @@ class CMyFrame;
 
 class CMapPlugin :public CNaviMapIOApi
 {
+	CBoat *Boat;;
 	bool MapPluginIsOn;
 	double GpsX, GpsY;
 	double momX, momY;
@@ -81,6 +83,10 @@ class CMapPlugin :public CNaviMapIOApi
 	int _LineBufLen;							// d³ugoœæ bufora lini
 
 	int DistanceUnit;
+	double MapX1,MapY1,MapX2,MapY2;
+	double dMapCircle[3];
+	nvCircle MapCircle,GpsCircle;
+	bool _NoSignal;
 
 
 	bool IsPointInsideBox(double px, double py, double bx1, double by1, double bx2, double by2); 
@@ -104,6 +110,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void RenderDistance();
 	float RenderText(double x, double y, wchar_t *text);
 	float RenderText(double x, double y, char *text);
+	void SetValues();
 					
 public:
 

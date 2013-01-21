@@ -1,5 +1,9 @@
+#ifndef __TRACK
+#define __TRACK
+
 #include <wx/wx.h>
 #include <vector>
+
 #include "conf.h"
 
 class CTrack
@@ -45,3 +49,5 @@ class CTrackList
 		~CTrackList();
 
 };
+
+#endif

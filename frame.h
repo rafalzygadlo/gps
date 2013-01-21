@@ -62,6 +62,7 @@ class CMyFrame: public wxDialog
 	void OnScan(wxHyperlinkEvent &event);
 	void OnInfo(wxHyperlinkEvent &event);
 	void OnUnit(wxHyperlinkEvent &event);
+	void OnBoat(wxHyperlinkEvent &event);
 
 public:
 
@@ -93,7 +94,8 @@ public:
 		ID_CHECK_LOG,
 		ID_SCAN,
 		ID_INFO,
-		ID_UNIT
+		ID_UNIT,
+		ID_BOAT
 	};
 };
 

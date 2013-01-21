@@ -23,7 +23,10 @@ const wxChar *nvLanguage[2][20] =
 		_("Distance unit"),
 		_("Ok"),
 		_("Cancel"),
-		_("Alarm configuration")
+		_("Alarm configuration"),
+		_("Boat configuration"),
+		_("Gps"),
+		_("Gps SETTINGS")
 		
 	},
 	

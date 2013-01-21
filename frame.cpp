@@ -8,6 +8,7 @@
 #include "info.h"
 #include "status.h"
 #include "unitconfig.h"
+#include "boatconfig.h"
 
 DEFINE_EVENT_TYPE(nvEVT_SET_LOG)
 DEFINE_EVENT_TYPE(nvEVT_SET_PORT)
@@ -21,6 +22,7 @@ BEGIN_EVENT_TABLE(CMyFrame,wxDialog)
 	EVT_HYPERLINK(ID_SCAN,CMyFrame::OnScan)
 	EVT_HYPERLINK(ID_INFO,CMyFrame::OnInfo)
 	EVT_HYPERLINK(ID_UNIT,CMyFrame::OnUnit)
+	EVT_HYPERLINK(ID_BOAT,CMyFrame::OnBoat)
 	EVT_COMMAND(ID_SET_LOG,nvEVT_SET_LOG,CMyFrame::OnSetLog)	//my own defined event
 //	EVT_COMMAND(ID_SET_PORT,nvEVT_SET_PORT,CMyFrame::OnSetPort)	//my own defined event
 	EVT_COMMAND(ID_SET_BAUD,nvEVT_SET_BAUD,CMyFrame::OnSetBaud)	//my own defined event
@@ -74,25 +76,36 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 
 	TopSizer->Add(ButtonSizer,1,wxALL|wxEXPAND,2);
 
+	wxFont font;
+	font.SetPointSize(8);
+	
 	wxStaticText *ScanInfo = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_PORT_INFO));
 	TopSizer->Add(ScanInfo,0,wxALL|wxEXPAND,5);
 	Scan = new wxHyperlinkCtrl(Panel,ID_SCAN,GetMsg(MSG_SCAN),wxEmptyString);
-	TopSizer->Add(Scan,0,wxALL,5);
+	Scan->SetFont(font);
+	TopSizer->Add(Scan,0,wxALL,2);
 	
-	wxStaticLine *line1 = new wxStaticLine(Panel,wxID_ANY);
-	TopSizer->Add(line1,0,wxALL|wxEXPAND,5);
-
+	//wxStaticLine *line1 = new wxStaticLine(Panel,wxID_ANY);
+	//TopSizer->Add(line1,0,wxALL|wxEXPAND,0);
+	
 	Info = new wxHyperlinkCtrl(Panel,ID_INFO,GetMsg(MSG_SIGNALS_INFO),wxEmptyString);
-	TopSizer->Add(Info,0,wxALL,5);
+	Info->SetFont(font);
+	TopSizer->Add(Info,0,wxALL,2);
 
 	wxHyperlinkCtrl *Unit = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_DISTANCE_UNITS),wxEmptyString);
-	TopSizer->Add(Unit,0,wxALL,5);
+	Unit->SetFont(font);
+	TopSizer->Add(Unit,0,wxALL,2);
 
-	wxHyperlinkCtrl *Alarm = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_ALARM_CONFIG),wxEmptyString);
-	TopSizer->Add(Alarm,0,wxALL,5);
+	//wxHyperlinkCtrl *Alarm = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_ALARM_CONFIG),wxEmptyString);
+	//Alarm->SetFont(font);
+	//TopSizer->Add(Alarm,0,wxALL,5);
 
-	wxStaticLine *line2 = new wxStaticLine(Panel,wxID_ANY);
-	TopSizer->Add(line2,0,wxALL|wxEXPAND,5);
+	wxHyperlinkCtrl *Boat = new wxHyperlinkCtrl(Panel,ID_BOAT,GetMsg(MSG_BOAT_CONFIG),wxEmptyString);
+	Boat->SetFont(font);
+	TopSizer->Add(Boat,0,wxALL,2);
+
+	//wxStaticLine *line2 = new wxStaticLine(Panel,wxID_ANY);
+	//TopSizer->Add(line2,0,wxALL|wxEXPAND,0);
 
 	wxBoxSizer *LeftSizer = new wxBoxSizer(wxHORIZONTAL);
 	CenterSizer->Add(LeftSizer,0,wxALL|wxEXPAND,5);
@@ -207,6 +220,17 @@ void CMyFrame::OnUnit(wxHyperlinkEvent &event)
 	}
 
 	delete UnitConfig;
+
+}
+
+void CMyFrame::OnBoat(wxHyperlinkEvent &event)
+{
+	CBoatConfig *BoatConfig = new CBoatConfig();
+	
+	BoatConfig->ShowModal();
+	
+
+	delete BoatConfig;
 
 }
 

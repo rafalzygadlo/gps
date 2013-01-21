@@ -5,6 +5,8 @@
 #include <wx/listctrl.h>
 #include "NaviDisplaySignals.h"
 #include "tools.h"
+#include "boat.h"
+#include "GeometryTools.h"
 
 
 unsigned char pib[] = 
@@ -56,6 +58,7 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	TrackList->AddTrack(Track);
 	DistanceUnit = 0;
 	ReadConfig();
+	_NoSignal = true;
 	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
@@ -235,8 +238,8 @@ bool CMapPlugin::GetNeedExit(void)
 void CMapPlugin::CreateApiMenu(void) 
 {
 
-	NaviApiMenu = new CNaviApiMenu( L"Settings" );	// nie u¿uwaæ delete - klasa zwalnia obiejt automatycznie
-	NaviApiMenu->AddItem( L"GPS",this, MenuConfig );
+	NaviApiMenu = new CNaviApiMenu( GetMsg(MSG_GPS).wchar_str() );	// nie u¿uwaæ delete - klasa zwalnia obiejt automatycznie
+	NaviApiMenu->AddItem( GetMsg(MSG_SETTINGS).wchar_str(),this, MenuConfig );
 	
 }
 
@@ -310,8 +313,10 @@ void CMapPlugin::SetNMEAInfoFunc(nmeaINFO *_nmea)
 		
 	Broker->Unproject(_X,_Y, &GpsX,&GpsY);
 	AddPoint(GpsX,GpsY,_nmea);
-	Broker->Refresh(Broker->GetParentPtr());
 	
+	Broker->Refresh(Broker->GetParentPtr());
+	_NoSignal = false;
+
 }
 
 void CMapPlugin::SendDisplaySignal(CMapPlugin *MapPlugin)
@@ -339,8 +344,10 @@ void CMapPlugin::SetLogFunc(char *text)
 	if(MyFrame == NULL)
 		return;
 	
+	mutex.Lock();
 	wxString buffer(text,wxConvUTF8,4096);
 	MyFrame->SetLogEvent(buffer);
+	mutex.Unlock();
 	
 }
 
@@ -364,14 +371,14 @@ void *CMapPlugin::NoSignal(void *NaviMapIOApiPtr, void *Params)
 {
 
 	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
-	ThisPtr->NewSignalFunc();
+	ThisPtr->NoSignalFunc();
 		
 	return NULL;
 }
 
 void CMapPlugin::NoSignalFunc()
 {
-		
+	_NoSignal = true;
 }
 
 
@@ -444,35 +451,40 @@ void CMapPlugin::BuildGeometry()
         Points.y = Radius*(float)cos(i*PI/180.0);
         vCircle3.push_back(Points);
     }
-
-
-    // line H
-    Points.x = -0.3;	Points.y =	0.0;    vLineH.push_back(Points);
-    Points.x = 0.3;		Points.y =	0.0;    vLineH.push_back(Points);
-    //line V
-    //Points.x = 0.0;		Points.y =	0.3;	vLineH.push_back(Points);
-    //Points.x = 0.0;		Points.y =	0.0;   vLineH.push_back(Points);
 	
-	// bok kat
-	Points.x = 0.0;		Points.y = -1.0;	vLineH.push_back(Points);
-	Points.x = 0.3;		Points.y = -0.5;	vLineH.push_back(Points);
-	// bok kat
-	Points.x = 0.0;		Points.y = -1.0;	vLineH.push_back(Points);
-	Points.x = -0.3;	Points.y = -0.5;	vLineH.push_back(Points);
+	// Ship1
+	Boat = new CBoat();
+    //Boat1->AddPoint(0.0,-1.0);	
+	//Boat1->AddPoint(-0.3,-0.5);
+	//Boat1->AddPoint(-0.3,1.0);	
 	
-	// bok
-	Points.x = 0.3;		Points.y = -0.5;	vLineH.push_back(Points);
-	Points.x = 0.3;		Points.y = 1.0;		vLineH.push_back(Points);
-	// bok 
-	Points.x = -0.3;	Points.y = -0.5;	vLineH.push_back(Points);
-	Points.x = -0.3;	Points.y = 1.0;		vLineH.push_back(Points);
+	//Boat1->AddPoint(0.3,1.0);
+	//Boat1->AddPoint(0.3,-0.5);
+	//Boat1->AddPoint(0.0,-1.0);
 	
-	Points.x = -0.3;    Points.y =	1.0;    vLineH.push_back(Points);
-    Points.x = 0.3;		Points.y =	1.0;    vLineH.push_back(Points);
-
-	//Points.x = -0.2;    Points.y =	1.0;    vLineH.push_back(Points);
-    //Points.x = 0.2;		Points.y =	1.0;    vLineH.push_back(Points);
-
+	// Ship2
+	//Boat2 = new CBoat();
+    //Boat2->AddPoint(0.0,-1.0);	
+	//Boat2->AddPoint(-0.3,-0.5);
+	//Boat2->AddPoint(-0.3,1.0);	
+	
+	//Boat2->AddPoint(0.3,1.0);
+	//Boat2->AddPoint(0.3,-0.5);
+	//Boat2->AddPoint(0.0,-1.0);
+	
+	//boat
+	//Boat3 = new CBoat();
+    //Boat3->AddPoint(0.0,-1.0);	
+	//Boat3->AddPoint(-0.3,-0.2);
+	//Boat3->AddPoint(-0.3,0.7);
+	//Boat3->AddPoint(-0.2,1.0);
+	
+	//Boat3->AddPoint(0.2,1.0);
+	//Boat3->AddPoint(0.3,0.7);
+	//Boat3->AddPoint(0.3,-0.2);
+	//Boat3->AddPoint(0.0,-1.0);	
+	
+	
 }
 
 void CMapPlugin::RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength)
@@ -597,6 +609,33 @@ double CMapPlugin::GetGpsY()
 	return _Y;
 }
 
+void CMapPlugin::SetValues()
+{
+	double vm[4];
+	Broker->GetVisibleMap(vm);
+
+
+	MapX1 = vm[0];
+	MapY1 = vm[1];
+	MapX2 = vm[2];
+	MapY2 = vm[3];
+
+
+	Broker->GetMapCircle(Broker->GetParentPtr(),dMapCircle);
+
+	MapCircle.Center.x = dMapCircle[0];
+	MapCircle.Center.y = dMapCircle[1];
+	MapCircle.Radius = dMapCircle[2];
+
+	GpsCircle.Center.x = GpsX;
+	GpsCircle.Center.y = GpsY;
+	GpsCircle.Radius = 0.0;
+
+	//Broker->Unproject(vm[0],vm[1], &MapX1, &MapY1);
+	//Broker->Unproject(vm[2],vm[3], &MapX2, &MapY2);
+	
+}
+
 float CMapPlugin::RenderText(double x, double y, wchar_t *text)
 {
 	//if(MapScale < Factor)
@@ -638,7 +677,7 @@ void CMapPlugin::RenderTracks()
 		std::vector<SPoint> pts = Tracks[i]->GetTrackPoints();
 		if(pts.size() > 0)
 		{
-			RenderGeometry(GL_POINTS,&pts[0], pts.size());				// punkty z gpsa
+			RenderGeometry(GL_POINTS,&pts[0],pts.size());				// punkty z gpsa
 			RenderGeometry(GL_LINE_STRIP,&pts[0], pts.size());			// linie
 		}
     }
@@ -678,17 +717,21 @@ void CMapPlugin::RenderPosition()
 	
 	if(GpsX == GPS_OUT_OF_COORDS || GpsY == GPS_OUT_OF_COORDS)
 		return;
-		
-	glColor4f(0.0f,0.0f,1.0f,0.5f);
+	
+	if(_NoSignal)
+		glColor4f(1.0f,0.0f,0.0f,0.5f);
+	else
+		glColor4f(0.0f,0.0f,1.0f,0.5f);
+	
 	glPushMatrix();
 		glLineWidth(2);
 		glTranslated(GpsX,GpsY,0.0);
-		glScalef(50.0/Scale,50.0/Scale,0.0f);
+		glScalef(60.0/Scale,60.0/Scale,0.0f);
 		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
 		RenderGeometry(GL_LINE_LOOP,&vCircle1[0],vCircle1.size());	// circle 0
 		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 1
 		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 1
-		RenderGeometry(GL_LINES,&vLineH[0],vLineH.size());			// line H
+		Boat->Render();
 		glLineWidth(1);
     glPopMatrix();
 
@@ -767,7 +810,14 @@ void CMapPlugin::Render(void)
 	
 	if( GetNeedExit())
         return;
+	
+	SetValues();
 		
+//	if(!nvIsCircleColision(&MapCircle,&GpsCircle))
+
+	
+	//	return;
+	
 	Scale = Broker->GetMapScale();
 		
     glEnable(GL_LINE_SMOOTH);
@@ -775,7 +825,7 @@ void CMapPlugin::Render(void)
 		
 	if( !TexturesCreated )
 		CreateTextures();
-	    
+	
 	RenderPosition();
     
 	if(_MouseOverIcon)
