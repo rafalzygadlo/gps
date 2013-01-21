@@ -2,6 +2,7 @@
 #include "boatconfig.h"
 #include "tools.h"
 #include "conf.h"
+#include "boat.h"
 
 BEGIN_EVENT_TABLE(CBoatConfig,wxDialog)
 END_EVENT_TABLE()
@@ -17,6 +18,9 @@ CBoatConfig::CBoatConfig()
 	Panel->SetBackgroundColour(wxColor(255,255,255));
 	Panel->SetSizer(PanelSizer);
 	
+	wxComboBox *b = new wxComboBox(Panel,wxID_ANY);
+	PanelSizer->Add(b,0,wxALL,0);
+
 			
 	MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
 	
@@ -33,6 +37,15 @@ CBoatConfig::CBoatConfig()
 	ButtonSizer->Add(ButtonCancel,0,wxALL|wxALIGN_RIGHT,5);
 
 	this->SetSizer(MainSizer);
+	CBoats *Boats = new CBoats();
+
+	for(size_t i = 0; i < Boats->GetCount(); i++)
+	{
+		CBoat *Boat = Boats->GetBoat(i);
+		b->Append( Boat->GetName());
+		
+	} 
+
 
 	GetSizer()->SetSizeHints(this);
 	

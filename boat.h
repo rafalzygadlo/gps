@@ -8,19 +8,37 @@
 
 class CBoat
 {
-	std::vector <SPoint> vPoint;
+	size_t Type;
+	wxString Name;
+	std::vector <SPoint> vPoints;
 	void RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength);	
-
-
+	
 public:
 	CBoat();
 	~CBoat();
-	std::vector<SPoint> GetPoints();
 
 	void AddPoint(double x, double y);
+	void SetName(wxString val);
+	wxString GetName();
+	void SetType(size_t type);
 	void Render();
-	
 		
 };
 
+class CBoats
+{
+
+	std::vector <CBoat*> vBoats;
+
+public:
+	CBoats();
+	~CBoats();
+
+	size_t GetCount();
+	//wxString GetName();
+	CBoat *GetBoat(size_t id);
+	void Append(CBoat *boat);
+	
+		
+};
 #endif

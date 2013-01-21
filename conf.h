@@ -132,6 +132,9 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define NV_PI 3.1415926535897932384626433
 enum nvDistanceUnits { nvNauticMiles, nvKilometer, nvMeter, nvDistanceSize = 3 };
 
+#define SHIP1_SIZE	6
+#define SHIP2_SIZE	6
+#define SHIP3_SIZE	8
 
 struct SPoint
 {
@@ -139,8 +142,6 @@ struct SPoint
 	double y;
 
 };
-
-
  
 typedef struct
 {
