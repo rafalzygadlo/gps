@@ -88,21 +88,21 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	//wxStaticLine *line1 = new wxStaticLine(Panel,wxID_ANY);
 	//TopSizer->Add(line1,0,wxALL|wxEXPAND,0);
 	
-	Info = new wxHyperlinkCtrl(Panel,ID_INFO,GetMsg(MSG_SIGNALS_INFO),wxEmptyString);
-	Info->SetFont(font);
-	TopSizer->Add(Info,0,wxALL,2);
+	//Info = new wxHyperlinkCtrl(Panel,ID_INFO,GetMsg(MSG_SIGNALS_INFO),wxEmptyString);
+	//Info->SetFont(font);
+	//TopSizer->Add(Info,0,wxALL,2);
 
-	wxHyperlinkCtrl *Unit = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_DISTANCE_UNITS),wxEmptyString);
-	Unit->SetFont(font);
-	TopSizer->Add(Unit,0,wxALL,2);
+	//wxHyperlinkCtrl *Unit = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_DISTANCE_UNITS),wxEmptyString);
+	//Unit->SetFont(font);
+	//TopSizer->Add(Unit,0,wxALL,2);
 
 	//wxHyperlinkCtrl *Alarm = new wxHyperlinkCtrl(Panel,ID_UNIT,GetMsg(MSG_ALARM_CONFIG),wxEmptyString);
 	//Alarm->SetFont(font);
 	//TopSizer->Add(Alarm,0,wxALL,5);
 
-	wxHyperlinkCtrl *Boat = new wxHyperlinkCtrl(Panel,ID_BOAT,GetMsg(MSG_BOAT_CONFIG),wxEmptyString);
-	Boat->SetFont(font);
-	TopSizer->Add(Boat,0,wxALL,2);
+	//wxHyperlinkCtrl *Boat = new wxHyperlinkCtrl(Panel,ID_BOAT,GetMsg(MSG_BOAT_CONFIG),wxEmptyString);
+	//Boat->SetFont(font);
+	//TopSizer->Add(Boat,0,wxALL,2);
 
 	//wxStaticLine *line2 = new wxStaticLine(Panel,wxID_ANY);
 	//TopSizer->Add(line2,0,wxALL|wxEXPAND,0);
@@ -211,8 +211,9 @@ void CMyFrame::OnInfo(wxHyperlinkEvent &event)
 
 void CMyFrame::OnUnit(wxHyperlinkEvent &event)
 {
-	CUnitConfig *UnitConfig = new CUnitConfig();
+	CUnitConfig *UnitConfig = new CUnitConfig(this);
 	UnitConfig->SetUnit(Unit);
+		
 	if(UnitConfig->ShowModal() == wxID_OK)
 	{
 		Unit = UnitConfig->GetUnit();

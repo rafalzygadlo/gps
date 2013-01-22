@@ -11,7 +11,7 @@ class CUnitConfig: public wxDialog
 						
 public:
 
-	CUnitConfig();
+	CUnitConfig(wxWindow *Parent);
 	~CUnitConfig();
 	void SetUnit(size_t val);
 	size_t GetUnit();

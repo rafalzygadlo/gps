@@ -24,7 +24,7 @@ const wxChar *nvLanguage[2][20] =
 		_("Ok"),
 		_("Cancel"),
 		_("Alarm configuration"),
-		_("Boat configuration"),
+		_("Gps BOAT SETTINGS"),
 		_("Gps"),
 		_("Gps SETTINGS")
 		

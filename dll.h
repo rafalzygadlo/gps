@@ -93,6 +93,8 @@ class CMapPlugin :public CNaviMapIOApi
 	void FoldLine( unsigned char *Buffer, int BufferLength );
 	void Parse(char *Buffer, int Length);
 	static void *MenuConfig(void *NaviMapIOApiPtr, void *Input);
+	static void *MenuBoatConfig(void *NaviMapIOApiPtr, void *Input);
+
 	void CreateApiMenu(void);
 	void CreateSumbols();
 	void CreateTexture(TTexture *Texture, GLuint *TextureID);
@@ -111,7 +113,8 @@ class CMapPlugin :public CNaviMapIOApi
 	float RenderText(double x, double y, wchar_t *text);
 	float RenderText(double x, double y, char *text);
 	void SetValues();
-					
+	void BoatConfig();				
+
 public:
 
 	CMapPlugin(CNaviBroker *NaviBroker);

@@ -6,6 +6,7 @@
 #include "NaviDisplaySignals.h"
 #include "tools.h"
 #include "boat.h"
+#include "boatconfig.h"
 #include "GeometryTools.h"
 
 
@@ -240,6 +241,7 @@ void CMapPlugin::CreateApiMenu(void)
 
 	NaviApiMenu = new CNaviApiMenu( GetMsg(MSG_GPS).wchar_str() );	// nie u¿uwaæ delete - klasa zwalnia obiejt automatycznie
 	NaviApiMenu->AddItem( GetMsg(MSG_SETTINGS).wchar_str(),this, MenuConfig );
+	NaviApiMenu->AddItem( GetMsg(MSG_BOAT_CONFIG).wchar_str(),this, MenuBoatConfig );
 	
 }
 
@@ -272,6 +274,26 @@ void CMapPlugin::Config()
 #endif
 
 }
+
+void *CMapPlugin::MenuBoatConfig(void *NaviMapIOApiPtr, void *Input) 
+{
+
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	ThisPtr->BoatConfig();
+
+	return NULL;
+}
+
+void CMapPlugin::BoatConfig()
+{
+
+	CBoatConfig *BoatConfig = new CBoatConfig();
+	BoatConfig->ShowModal();
+	delete BoatConfig;
+}
+
+
+
 
 //void *CMapPlugin::SetExit(void *NaviMapIOApiPtr, void *Params)
 //{
@@ -445,46 +467,18 @@ void CMapPlugin::BuildGeometry()
 	// third circle
     Radius = 2.0f;
 	CircleRadius = Radius;
-    for(int i=0; i<360; i+=6)
+    for(int i=0; i<360; i+=10)
     {
         Points.x = Radius*(float)sin(i*PI/180.0);
         Points.y = Radius*(float)cos(i*PI/180.0);
         vCircle3.push_back(Points);
     }
 	
-	// Ship1
-	Boat = new CBoat();
-    //Boat1->AddPoint(0.0,-1.0);	
-	//Boat1->AddPoint(-0.3,-0.5);
-	//Boat1->AddPoint(-0.3,1.0);	
-	
-	//Boat1->AddPoint(0.3,1.0);
-	//Boat1->AddPoint(0.3,-0.5);
-	//Boat1->AddPoint(0.0,-1.0);
-	
-	// Ship2
-	//Boat2 = new CBoat();
-    //Boat2->AddPoint(0.0,-1.0);	
-	//Boat2->AddPoint(-0.3,-0.5);
-	//Boat2->AddPoint(-0.3,1.0);	
-	
-	//Boat2->AddPoint(0.3,1.0);
-	//Boat2->AddPoint(0.3,-0.5);
-	//Boat2->AddPoint(0.0,-1.0);
-	
-	//boat
-	//Boat3 = new CBoat();
-    //Boat3->AddPoint(0.0,-1.0);	
-	//Boat3->AddPoint(-0.3,-0.2);
-	//Boat3->AddPoint(-0.3,0.7);
-	//Boat3->AddPoint(-0.2,1.0);
-	
-	//Boat3->AddPoint(0.2,1.0);
-	//Boat3->AddPoint(0.3,0.7);
-	//Boat3->AddPoint(0.3,-0.2);
-	//Boat3->AddPoint(0.0,-1.0);	
-	
-	
+	CBoats *Boats = new CBoats();
+
+	Boat = Boats->GetBoat(0);
+
+		
 }
 
 void CMapPlugin::RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength)
@@ -698,9 +692,9 @@ void CMapPlugin::RenderSelection()
 		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
 		glBegin(GL_QUADS);
 			glVertex2f(vCircle3[ 0].x,vCircle3[ 0].y);
-			glVertex2f(vCircle3[15].x,vCircle3[15].y);
-			glVertex2f(vCircle3[30].x,vCircle3[30].y);
-			glVertex2f(vCircle3[45].x,vCircle3[45].y);
+			glVertex2f(vCircle3[9].x,vCircle3[9].y);
+			glVertex2f(vCircle3[18].x,vCircle3[18].y);
+			glVertex2f(vCircle3[27].x,vCircle3[27].y);
 		glEnd();
     glPopMatrix();
 			
@@ -728,9 +722,10 @@ void CMapPlugin::RenderPosition()
 		glTranslated(GpsX,GpsY,0.0);
 		glScalef(60.0/Scale,60.0/Scale,0.0f);
 		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
-		RenderGeometry(GL_LINE_LOOP,&vCircle1[0],vCircle1.size());	// circle 0
-		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 1
-		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 1
+		RenderGeometry(GL_LINE_LOOP,&vCircle1[0],vCircle1.size());	// circle 1
+		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 2
+		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 3
+		RenderGeometry(GL_POINTS,&vCircle3[0],vCircle3.size());  // circle 3
 		Boat->Render();
 		glLineWidth(1);
     glPopMatrix();

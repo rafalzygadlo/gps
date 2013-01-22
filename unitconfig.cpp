@@ -7,8 +7,8 @@ BEGIN_EVENT_TABLE(CUnitConfig,wxDialog)
 	EVT_RADIOBUTTON(wxID_ANY,CUnitConfig::OnRadio)
 END_EVENT_TABLE()
 
-CUnitConfig::CUnitConfig()
-:wxDialog( NULL,wxID_ANY, GetProductName(), wxDefaultPosition, wxDefaultSize )
+CUnitConfig::CUnitConfig(wxWindow *Parent)
+:wxDialog( Parent,wxID_ANY, GetProductName(), wxDefaultPosition, wxDefaultSize )
 {
 	Unit = 0;
 	

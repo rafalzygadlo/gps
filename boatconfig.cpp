@@ -5,6 +5,7 @@
 #include "boat.h"
 
 BEGIN_EVENT_TABLE(CBoatConfig,wxDialog)
+	EVT_COMBOBOX(ID_BOAT,CBoatConfig::OnBoat)
 END_EVENT_TABLE()
 
 CBoatConfig::CBoatConfig()
@@ -15,13 +16,15 @@ CBoatConfig::CBoatConfig()
 	
 	wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxPanel *Panel = new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-	Panel->SetBackgroundColour(wxColor(255,255,255));
+	//Panel->SetBackgroundColour(wxColor(255,255,255));
 	Panel->SetSizer(PanelSizer);
 	
-	wxComboBox *b = new wxComboBox(Panel,wxID_ANY);
-	PanelSizer->Add(b,0,wxALL,0);
+	wxComboBox *ComboBoat = new wxComboBox(Panel,ID_BOAT,wxEmptyString,wxDefaultPosition,wxDefaultSize,NULL,wxCB_READONLY);
+	PanelSizer->Add(ComboBoat,0,wxALL,5);
 
-			
+	BoatPanel = new CBoatPanel(Panel);
+	PanelSizer->Add(BoatPanel,0,wxALL,5);
+				
 	MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
 	
 	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -37,27 +40,24 @@ CBoatConfig::CBoatConfig()
 	ButtonSizer->Add(ButtonCancel,0,wxALL|wxALIGN_RIGHT,5);
 
 	this->SetSizer(MainSizer);
-	CBoats *Boats = new CBoats();
+	Boats = new CBoats();
 
 	for(size_t i = 0; i < Boats->GetCount(); i++)
 	{
 		CBoat *Boat = Boats->GetBoat(i);
-		b->Append( Boat->GetName());
-		
+		ComboBoat->Append( Boat->GetName());
 	} 
-
-
+	
 	GetSizer()->SetSizeHints(this);
 	
 }
 
 CBoatConfig::~CBoatConfig()
 {
-
+	delete Boats;
 }
 
-
-//CBoatPanel::CBoatPanel()
-//{
-
-//}
+void CBoatConfig::OnBoat(wxCommandEvent &event)
+{
+	BoatPanel->SetBoat(Boats->GetBoat(event.GetSelection()));
+}
