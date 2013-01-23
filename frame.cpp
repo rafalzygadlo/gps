@@ -211,7 +211,7 @@ void CMyFrame::OnInfo(wxHyperlinkEvent &event)
 
 void CMyFrame::OnUnit(wxHyperlinkEvent &event)
 {
-	CUnitConfig *UnitConfig = new CUnitConfig(this);
+	CUnitConfig *UnitConfig = new CUnitConfig();
 	UnitConfig->SetUnit(Unit);
 		
 	if(UnitConfig->ShowModal() == wxID_OK)

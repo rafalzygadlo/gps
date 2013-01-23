@@ -6,6 +6,7 @@
 #include "NaviDisplaySignals.h"
 #include "tools.h"
 #include "boat.h"
+#include "unitconfig.h"
 #include "boatconfig.h"
 #include "GeometryTools.h"
 
@@ -54,9 +55,14 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	TexturesCreated = false;
 	CreateSumbols();
 	CreateApiMenu();
-	Track = new CTrack();
-	TrackList = new CTrackList();
-	TrackList->AddTrack(Track);
+	//Track = new CTrack();
+	//TrackList = new CTrackList();
+	//TrackList->AddTrack(Track);
+	
+	Boats = new CBoats();
+	Boat = Boats->GetBoat(0);
+
+
 	DistanceUnit = 0;
 	ReadConfig();
 	_NoSignal = true;
@@ -76,9 +82,10 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 CMapPlugin::~CMapPlugin()
 {
 	delete DisplaySignal;
-	delete Track;
+	//delete Track;
 	//delete TrackList;
 	delete MyFrame;
+	delete Boats;
 	MyFrame = NULL;
 	MySerial = NULL;
 }
@@ -242,6 +249,7 @@ void CMapPlugin::CreateApiMenu(void)
 	NaviApiMenu = new CNaviApiMenu( GetMsg(MSG_GPS).wchar_str() );	// nie u¿uwaæ delete - klasa zwalnia obiejt automatycznie
 	NaviApiMenu->AddItem( GetMsg(MSG_SETTINGS).wchar_str(),this, MenuConfig );
 	NaviApiMenu->AddItem( GetMsg(MSG_BOAT_CONFIG).wchar_str(),this, MenuBoatConfig );
+	NaviApiMenu->AddItem( GetMsg(MSG_DISTANCE_UNIT_CONFIG).wchar_str(),this, MenuDistanceUnitConfig );
 	
 }
 
@@ -290,6 +298,28 @@ void CMapPlugin::BoatConfig()
 	CBoatConfig *BoatConfig = new CBoatConfig();
 	BoatConfig->ShowModal();
 	delete BoatConfig;
+}
+
+void *CMapPlugin::MenuDistanceUnitConfig(void *NaviMapIOApiPtr, void *Input) 
+{
+
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	ThisPtr->DistanceUnitConfig();
+
+	return NULL;
+}
+
+void CMapPlugin::DistanceUnitConfig()
+{
+	CUnitConfig *UnitConfig = new CUnitConfig();
+	UnitConfig->SetUnit(GetUnit());
+		
+	if(UnitConfig->ShowModal() == wxID_OK)
+	{
+		SetUnit(UnitConfig->GetUnit());
+	}
+
+	delete UnitConfig;
 }
 
 
@@ -474,9 +504,7 @@ void CMapPlugin::BuildGeometry()
         vCircle3.push_back(Points);
     }
 	
-	CBoats *Boats = new CBoats();
-
-	Boat = Boats->GetBoat(0);
+	
 
 		
 }
@@ -831,7 +859,7 @@ void CMapPlugin::Render(void)
 	}
         
 	//RenderAnimation();	
-	RenderTracks();
+	//RenderTracks();
 		
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);

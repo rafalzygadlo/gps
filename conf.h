@@ -74,6 +74,12 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_BOAT_CONFIG				16
 #define MSG_GPS						17
 #define MSG_SETTINGS				18
+#define MSG_DISTANCE_UNIT_CONFIG	19
+#define MSG_SHIP1					20
+#define MSG_SHIP2					21
+#define MSG_BOAT1					22
+#define MSG_BOAT2					23
+#define MSG_TRIANGLE				24
 
 
 #define nvPI 3.1415926535897932384626433832795

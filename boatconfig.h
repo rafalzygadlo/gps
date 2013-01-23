@@ -9,12 +9,14 @@ class CBoatConfig: public wxDialog
 
 	CBoatPanel *BoatPanel;
 	CBoats *Boats;
+	wxListBox *ListBoat;
 	void OnBoat(wxCommandEvent &event);
 
 public:
 
 	CBoatConfig();
 	~CBoatConfig();
+	size_t GetId();
 		
 	DECLARE_EVENT_TABLE();
 	

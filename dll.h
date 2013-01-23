@@ -35,7 +35,8 @@ class CMyFrame;
 
 class CMapPlugin :public CNaviMapIOApi
 {
-	CBoat *Boat;;
+	CBoat *Boat;
+	CBoats *Boats;
 	bool MapPluginIsOn;
 	double GpsX, GpsY;
 	double momX, momY;
@@ -94,6 +95,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void Parse(char *Buffer, int Length);
 	static void *MenuConfig(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuBoatConfig(void *NaviMapIOApiPtr, void *Input);
+	static void *MenuDistanceUnitConfig(void *NaviMapIOApiPtr, void *Input);
 
 	void CreateApiMenu(void);
 	void CreateSumbols();
@@ -113,7 +115,8 @@ class CMapPlugin :public CNaviMapIOApi
 	float RenderText(double x, double y, wchar_t *text);
 	float RenderText(double x, double y, char *text);
 	void SetValues();
-	void BoatConfig();				
+	void BoatConfig();
+	void DistanceUnitConfig();
 
 public:
 

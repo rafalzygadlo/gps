@@ -4,7 +4,7 @@
 
 
 int GlobalLanguageID;
-const wxChar *nvLanguage[2][20] = 
+const wxChar *nvLanguage[2][25] = 
 { 
 	/*EN*/
 	{
@@ -26,7 +26,14 @@ const wxChar *nvLanguage[2][20] =
 		_("Alarm configuration"),
 		_("Gps BOAT SETTINGS"),
 		_("Gps"),
-		_("Gps SETTINGS")
+		_("Gps SETTINGS"),
+		_("Gps DISTANCE UNIT SETTINGS"),
+		_("Classic Ship"),
+		_("Ship"),
+		_("Classic Boat"),
+		_("Boat"),
+		_("Triangle")
+		
 		
 	},
 	

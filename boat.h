@@ -9,25 +9,40 @@
 
 class CBoats;
 class CBoatPanel;
-class CBoat : public wxPanel
+class CBoatPoints
+{
+	std::vector <SPoint> vPoints;
+
+public:
+	
+	CBoatPoints();
+	~CBoatPoints();
+	void AddPoint(double x, double y);
+	SPoint GetPoint(size_t id);
+	size_t GetCount();
+
+};
+
+class CBoat
 {
 	CBoatPanel *BoatPanel;
 	size_t Type;
 	wxString Name;
-	std::vector <SPoint> vPoints;
+	wxArrayPtrVoid GeometryList;
 	void RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength);	
-	
 
 public:
 
 	CBoat();
 	~CBoat();
 
-	void AddPoint(double x, double y);
+	void AddGeometry(CBoatPoints *BoatPoints);
+	void *GetGeometry(size_t id);
+	size_t GetCount();
 	void SetName(wxString val);
 	wxString GetName();
-	size_t GetCount();
-	SPoint GetPoint(size_t id);
+	
+	//SPoint GetPoint(size_t id);
 	wxPanel *GetBoatPanel();
 	void SetType(size_t type);
 	void Render();
@@ -43,6 +58,7 @@ class CBoatPanel: public wxGLCanvas
 	void UpdateViewPort();
 	void OnPaint(wxPaintEvent &event);
 	void OnSize(wxSizeEvent& event);
+	void OnMouse(wxMouseEvent &event);
 
 public:
 	
