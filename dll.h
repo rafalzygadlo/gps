@@ -70,7 +70,6 @@ class CMapPlugin :public CNaviMapIOApi
 
 	int AreaSize;								// area size saved in config (from spin)
 	bool _ShowHint;
-	wxFileConfig *FileConfig;
 	std::vector <SPoint> vCircle1,vCircle2,vCircle3,vLineV, vLineH;
 	std::vector <SPoint>::iterator itvVertex;
 	wxString ConfigPath;
@@ -96,6 +95,7 @@ class CMapPlugin :public CNaviMapIOApi
 	static void *MenuConfig(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuBoatConfig(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuDistanceUnitConfig(void *NaviMapIOApiPtr, void *Input);
+	static void *MenuStatus(void *NaviMapIOApiPtr, void *Input);
 
 	void CreateApiMenu(void);
 	void CreateSumbols();
@@ -117,6 +117,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void SetValues();
 	void BoatConfig();
 	void DistanceUnitConfig();
+	void Status();
 
 public:
 

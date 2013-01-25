@@ -20,7 +20,8 @@ CBoatConfig::CBoatConfig()
 	Panel->SetSizer(PanelSizer);
 		
 	BoatPanel = new CBoatPanel(Panel);
-	PanelSizer->Add(BoatPanel,0,wxALL,5);
+	PanelSizer->Add(BoatPanel,1,wxALL|wxEXPAND,5);
+	BoatPanel->SetSize(200,200);
 	
 	ListBoat = new wxListBox(Panel,ID_BOAT,wxDefaultPosition,wxDefaultSize);
 	PanelSizer->Add(ListBoat,1,wxALL|wxEXPAND,5);

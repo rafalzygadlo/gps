@@ -6,6 +6,7 @@
 #include "NaviDisplaySignals.h"
 #include "tools.h"
 #include "boat.h"
+#include "status.h"
 #include "unitconfig.h"
 #include "boatconfig.h"
 #include "GeometryTools.h"
@@ -39,7 +40,6 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	DisplaySignal = new CDisplaySignal(NDS_GPS);
 	nmea_zero_INFO(&NmeaInfo);
 	IsWorking = true;
-	FileConfig = NULL;
     _ShowHint = false;
     IsData = false;
     NeedExit = false;
@@ -55,9 +55,9 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	TexturesCreated = false;
 	CreateSumbols();
 	CreateApiMenu();
-	//Track = new CTrack();
-	//TrackList = new CTrackList();
-	//TrackList->AddTrack(Track);
+	Track = new CTrack();
+	TrackList = new CTrackList();
+	TrackList->AddTrack(Track);
 	
 	Boats = new CBoats();
 	Boat = Boats->GetBoat(0);
@@ -102,7 +102,7 @@ CTrackList *CMapPlugin::GetTrackList()
 
 void CMapPlugin::ReadConfig()
 {
-	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
+	wxFileConfig *FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	FileConfig->Read(_(KEY_DISTANCE_UNIT), &DistanceUnit,nvNauticMiles);
 	delete FileConfig;
 
@@ -110,11 +110,12 @@ void CMapPlugin::ReadConfig()
 
 void CMapPlugin::WriteConfig()
 {
-	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
+	wxFileConfig *FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	FileConfig->Write(_(KEY_DISTANCE_UNIT), DistanceUnit);
 			
 	bool running = MySerial->IsRunning();
 	wxString port(MySerial->GetPortName(),wxConvUTF8);
+	fprintf(stdout,"%s\n",port.char_str());
 	int baud = MySerial->GetBaudRate();
 	
 	FileConfig->Write(_(KEY_PORT),port);
@@ -154,10 +155,10 @@ void CMapPlugin::CreateTextures(void)
 }
 
 
-wxFileConfig *CMapPlugin::GetFileConfig()
-{
-    return FileConfig;
-}
+//wxFileConfig *CMapPlugin::GetFileConfig()
+//{
+
+//}
 
 CNaviBroker *CMapPlugin::GetBroker()
 {
@@ -183,7 +184,7 @@ void CMapPlugin::Run(void *Params)
     MySerial = new CMySerial(Broker);
 	    
 	
-	FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
+	wxFileConfig *FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	
     wxString port;
 			
@@ -250,6 +251,7 @@ void CMapPlugin::CreateApiMenu(void)
 	NaviApiMenu->AddItem( GetMsg(MSG_SETTINGS).wchar_str(),this, MenuConfig );
 	NaviApiMenu->AddItem( GetMsg(MSG_BOAT_CONFIG).wchar_str(),this, MenuBoatConfig );
 	NaviApiMenu->AddItem( GetMsg(MSG_DISTANCE_UNIT_CONFIG).wchar_str(),this, MenuDistanceUnitConfig );
+	NaviApiMenu->AddItem( GetMsg(MSG_STATUS).wchar_str(),this, MenuStatus );
 	
 }
 
@@ -322,8 +324,22 @@ void CMapPlugin::DistanceUnitConfig()
 	delete UnitConfig;
 }
 
+void *CMapPlugin::MenuStatus(void *NaviMapIOApiPtr, void *Input) 
+{
 
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	ThisPtr->Status();
 
+	return NULL;
+}
+
+void CMapPlugin::Status()
+{
+	CStatus *Status = new CStatus(MySerial);
+	Status->ShowModal();
+	delete Status;
+
+}
 
 //void *CMapPlugin::SetExit(void *NaviMapIOApiPtr, void *Params)
 //{
@@ -615,8 +631,8 @@ void CMapPlugin::AddPoint(double x, double y, nmeaINFO *info)
 
 	mutex.Lock();
 #ifdef BUILD_GPS_POINTS_VECTOR
-	Track->AddPoint(x,y);
-	Track->AddPointInfo(x,y,info);
+	//Track->AddPoint(x,y);
+	//Track->AddPointInfo(x,y,info);
 #endif
 	mutex.Unlock();
 
@@ -754,7 +770,7 @@ void CMapPlugin::RenderPosition()
 		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 2
 		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 3
 		RenderGeometry(GL_POINTS,&vCircle3[0],vCircle3.size());  // circle 3
-		Boat->Render();
+		Boat->RenderBoat();
 		glLineWidth(1);
     glPopMatrix();
 

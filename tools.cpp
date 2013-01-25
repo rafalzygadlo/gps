@@ -4,7 +4,7 @@
 
 
 int GlobalLanguageID;
-const wxChar *nvLanguage[2][25] = 
+const wxChar *nvLanguage[2][30] = 
 { 
 	/*EN*/
 	{
@@ -26,13 +26,19 @@ const wxChar *nvLanguage[2][25] =
 		_("Alarm configuration"),
 		_("Gps BOAT SETTINGS"),
 		_("Gps"),
-		_("Gps SETTINGS"),
+		_("Gps CONNECTION SETTINGS"),
 		_("Gps DISTANCE UNIT SETTINGS"),
 		_("Classic Ship"),
 		_("Ship"),
 		_("Classic Boat"),
 		_("Boat"),
-		_("Triangle")
+		_("Triangle"),
+		_("Bad CRC"),
+		_("Gps STATUS"),
+		_("Connected"),
+		_("Number of NMEA lines"),
+		_("Signal Quality")
+
 		
 		
 	},
@@ -251,5 +257,87 @@ double nvDistance(double lon1, double lat1, double lon2, double lat2, size_t dis
 double nvToRad( double degree ) 
 {
 	return (NV_PI * degree / 180 );
+}
+
+CBoat *CreateBoat1()
+{
+	CBoat *Boat = new CBoat();
+	Boat->SetName(GetMsg(MSG_SHIP1));
+	CNaviGeometry *Geometry = Boat->CreateGeometry();
+	Boat->AddGeometry(Geometry);
+	CNaviVertexArray *VertexArray = Boat->CreateVertexArray();
+	Geometry->AddVertexArray(VertexArray);
+	
+	VertexArray->AddVertex(0.0,-1.0,0.0); 
+	VertexArray->AddVertex(-0.3,-0.5,0.0); 
+	VertexArray->AddVertex(-0.3,1.0,0.0); 
+	VertexArray->AddVertex(0.3,1.0,0.0); 
+	VertexArray->AddVertex(0.3,-0.5,0.0);
+	
+	return Boat;
+
+}
+
+CBoat *CreateBoat2()
+{
+	CBoat *Boat = new CBoat();
+	Boat->SetName(GetMsg(MSG_BOAT1));
+	CNaviGeometry *Geometry = Boat->CreateGeometry();
+	Boat->AddGeometry(Geometry);
+	CNaviVertexArray *VertexArray = Boat->CreateVertexArray();
+	Geometry->AddVertexArray(VertexArray);
+	
+	VertexArray->AddVertex(0.0,-1.0,0.0); 
+	VertexArray->AddVertex(-0.3,-0.2,0.0); 
+	VertexArray->AddVertex(-0.3,1.0,0.0);	
+	VertexArray->AddVertex(0.3,1.0,0.0); 
+	VertexArray->AddVertex(0.3,-0.2,0.0); 
+		
+	return Boat;
+	
+}
+
+
+CBoat *CreateBoat3()
+{
+	CBoat *Boat = new CBoat();
+	Boat->SetName(GetMsg(MSG_SHIP2));
+	CNaviGeometry *Geometry = Boat->CreateGeometry();
+	Boat->AddGeometry(Geometry);
+	CNaviVertexArray *VertexArray = Boat->CreateVertexArray();
+	Geometry->AddVertexArray(VertexArray);
+	
+	VertexArray->AddVertex(0.0,-1.0,0.0);
+	VertexArray->AddVertex(-0.25,-0.5,0.0);
+	VertexArray->AddVertex(-0.3,-0.3,0.0);
+	VertexArray->AddVertex(-0.3,0.7,0.0);
+	VertexArray->AddVertex(-0.2,1.0,0.0);
+	VertexArray->AddVertex(0.2,1.0,0.0);
+	VertexArray->AddVertex(0.3,0.7,0.0);
+	VertexArray->AddVertex(0.3,-0.3,0.0);
+	VertexArray->AddVertex(0.25,-0.5,0.0);
+
+	return Boat;
+}
+
+CBoat *CreateBoat4()
+{
+	CBoat *Boat = new CBoat();
+	Boat->SetName(GetMsg(MSG_BOAT2));
+	CNaviGeometry *Geometry = Boat->CreateGeometry();
+	Boat->AddGeometry(Geometry);
+	CNaviVertexArray *VertexArray = Boat->CreateVertexArray();
+	Geometry->AddVertexArray(VertexArray);
+	
+	VertexArray->AddVertex(0.0,-1.0,0.0); 
+	VertexArray->AddVertex(-0.3,-0.2,0.0); 
+	VertexArray->AddVertex(-0.3,0.7,0.0);	
+	VertexArray->AddVertex(-0.2,1.0,0.0); 
+	VertexArray->AddVertex(0.2,1.0,0.0); 
+	VertexArray->AddVertex(0.3,0.7,0.0); 
+	VertexArray->AddVertex(0.3,-0.2,0.0);	
+	
+	return Boat;
+	
 }
 

@@ -28,19 +28,23 @@ CStatus::CStatus(CMySerial *serial)
 	
 	Panel1->SetSizer(Panel1Sizer);
 		
-	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(500,200),wxTE_MULTILINE | wxTE_READONLY | wxTE_DONTWRAP);
+	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(400,200),wxTE_MULTILINE | wxTE_READONLY |wxTE_CAPITALIZE);
 	Panel1Sizer->Add(Status,0,wxALL|wxEXPAND,0);
 
 	wxString port(serial->GetPortName(),wxConvUTF8);
 	Status->AppendText(wxString::Format(_("%s: %s\n"),GetMsg(MSG_PORT).wc_str(),port.wc_str()));
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAUD).wc_str(),serial->GetBaudRate()));
-		
+	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_CONNECTED).wc_str(),serial->IsConnected()));
+	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAD_CRC).wc_str(),serial->GetBadCRC()));
+	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_NMEA_LINES).wc_str(),serial->GetLinesCount()));	
+	Status->AppendText(wxString::Format(_("%s: %d%%\n\n"),GetMsg(MSG_SIGNAL_QUALITY).wc_str(),serial->GetSignalQuality()));	
+
 	for(size_t i = 0; i < serial->GetSignalCount();i++)
 	{
 		wxString name((char*)serial->GetSignal(i)->name,wxConvUTF8);
 		wxString nmea((char*)serial->GetSignal(i)->nmea,wxConvUTF8);
 		
-		Status->AppendText(wxString::Format(_("%s: %s"),name.wc_str(),nmea.wc_str()));
+		Status->AppendText(wxString::Format(_("%s: %d\n"),name.wc_str(),serial->GetSignal(i)->count));
 	}
 			
 	this->SetSizer(MainSizer);

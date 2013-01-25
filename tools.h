@@ -3,6 +3,7 @@
 
 #include <wx/wx.h>
 #include "NaviBroker.h"
+#include "boat.h"
 
 char *gen_random(const int len);
 wxString GenerateRandomFileName(wxString dir, wxString ext, int len);
@@ -21,4 +22,11 @@ wxString GetDistanceUnit(size_t id);
 wxString GetDistanceName(size_t id);
 wxString GetProductInfo();
 wxString GetProductName();
+
+CBoat* CreateBoat1();
+CBoat* CreateBoat2();
+CBoat* CreateBoat3();
+CBoat* CreateBoat4();
+
+
 #endif

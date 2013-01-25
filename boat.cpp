@@ -1,66 +1,38 @@
-
 #include "boat.h"
 #include "tools.h"
 
 
-CBoatPoints::CBoatPoints()
-{
-	
-}
-
-CBoatPoints::~CBoatPoints()
-{
-	vPoints.clear();
-}
-
-
-void CBoatPoints::AddPoint(double x, double y)
-{
-	SPoint pt;
-	pt.x = x;
-	pt.y = y;
-	vPoints.push_back(pt);
-}
-
-SPoint CBoatPoints::GetPoint(size_t id)
-{
-	return vPoints[id];
-}
-
-size_t CBoatPoints::GetCount()
-{
-	return vPoints.size();
-}
-
-// . . . . . . . . . . . . .. . . 
-
-
 CBoat::CBoat()
 {
+	BoatGeometryGroup = CNaviGeometryGroup::Create(NULL);
+		
+	CNaviVertexArray *VertexArray = VertexArray = CNaviVertexArray::Create(NULL);
+	VertexArray->SetType(EXTERIOR_VERTEX_ARRAY);
 	
 }
 
 CBoat::~CBoat()
 {
-	
+	CNaviGeometryGroup::Destroy(BoatGeometryGroup);
 }
 
-void CBoat::AddGeometry(CBoatPoints *BoatPoints)
+CNaviGeometry *CBoat::CreateGeometry()
 {
-	GeometryList.Add(BoatPoints);		
+	CNaviGeometry *BoatGeometry = CNaviGeometry::Create();
+	return BoatGeometry;
 }
 
-void *CBoat::GetGeometry(size_t id)
+void CBoat::AddGeometry(CNaviGeometry *geometry)
 {
-	return GeometryList.Item(id);
+	BoatGeometryGroup->AddGeometry(geometry);
 }
 
-size_t CBoat::GetCount()
+CNaviVertexArray *CBoat::CreateVertexArray()
 {
-	return GeometryList.size();
+	CNaviVertexArray *VertexArray = VertexArray = CNaviVertexArray::Create(NULL);
+	VertexArray->SetType(EXTERIOR_VERTEX_ARRAY);
+	return VertexArray;
 }
-
-
 
 void CBoat::SetType(size_t type)
 {
@@ -87,14 +59,8 @@ void CBoat::RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength)
 	
 }
 
-void CBoat::Render()
+void CBoat::RenderBackground()
 {
-
-	glEnable(GL_BLEND);
-	glEnable(GL_POINT_SMOOTH);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		
-	glTranslatef(0.0,0.0,0.0);
 	glPointSize(10);		
 	glColor4f(0.0f,0.0f,0.0f,1.0f);
 	glBegin(GL_POINTS);
@@ -117,36 +83,47 @@ void CBoat::Render()
 		glVertex3f(-1.0f,-1.0f,0.0f);
 		glVertex3f(1.0f,-1.0f,0.0f);
 	glEnd();
-	
-	
-	for(size_t i = 0; i < GeometryList.size(); i++)
-	{
-		CBoatPoints *Points = (CBoatPoints*)GeometryList.Item(i);
-		
-		glColor4f(0.0f,0.0f,1.0f,0.5f);
-		glBegin(GL_LINE_LOOP);
-		
-		size_t j = 0;
-		for(j = 0; j < Points->GetCount(); j++)
-			glVertex2f(Points->GetPoint(j).x,Points->GetPoint(j).y);	
-		glEnd();
-			
-		glColor4f(0.0f,0.0f,1.0f,0.2f);
-		glBegin(GL_POLYGON);
-		for(j = 0; j < Points->GetCount(); j++)
-			glVertex2f(Points->GetPoint(j).x,Points->GetPoint(j).y);	
-		glEnd();
-		
-		glColor4f(1.0f,0.0f,0.0f,0.5f);
-		glPointSize(5);
-		
-		glBegin(GL_POINTS);
-		for(j = 0; j < Points->GetCount(); j++)
-			glVertex2f(Points->GetPoint(j).x,Points->GetPoint(j).y);	
-		glEnd();
-		
-	}
 
+}
+
+void CBoat::RenderBoat()
+{
+	for(size_t i = 0; i < BoatGeometryGroup->Length(); i++)
+	{
+		CNaviGeometry *Geometry = BoatGeometryGroup->GetGeometry(i);
+			
+		Geometry->First();
+		while(!Geometry->Eof())
+		{
+			CNaviVertexArray *VertexArray = Geometry->GetVertexArray();
+			VertexArray->First();
+			glColor4f(0.0f,0.0f,1.0f,0.5f);
+			RenderGeometry(GL_LINE_LOOP,VertexArray->GetRawArray(),VertexArray->Length());
+
+			glColor4f(0.0f,0.0f,1.0f,0.2f);
+			RenderGeometry(GL_POLYGON,VertexArray->GetRawArray(),VertexArray->Length());
+						
+			glPointSize(8);
+			glColor4f(1.0f,0.0f,0.0f,0.2f);
+			RenderGeometry(GL_POINTS,VertexArray->GetRawArray(),VertexArray->Length());
+			glPointSize(1);
+			Geometry->Next();
+		}
+	}
+}
+
+void CBoat::Render()
+{
+
+	glEnable(GL_BLEND);
+	glEnable(GL_POINT_SMOOTH);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+	glTranslatef(0.0,0.0,0.0);
+	
+	RenderBackground();
+	RenderBoat();
+	
 	glDisable(GL_POINT_SMOOTH);
 	glDisable(GL_BLEND);
 
@@ -161,12 +138,14 @@ END_EVENT_TABLE()
 
 
 CBoatPanel::CBoatPanel(wxWindow *parent)
- :wxGLCanvas( parent, (wxGLCanvas*) NULL, wxID_ANY, wxDefaultPosition, wxSize(200,200))
+:wxGLCanvas( parent, (wxGLCanvas*) NULL, wxID_ANY, wxDefaultPosition, wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
  
 {
 	GLContext = new wxGLContext(this);
 	Boat = NULL;
-	
+	ScreenWidth = 0;
+	ScreenHeight = 0;
+		
 }
 
 CBoatPanel::~CBoatPanel()
@@ -191,15 +170,14 @@ void CBoatPanel::OnSize(wxSizeEvent &event)
 {
 	int w, h;
 	GetClientSize(&w, &h);
-	 
+	fprintf(stdout,"%d %d\n",ScreenWidth,ScreenHeight);
 	ScreenWidth = w;
 	ScreenHeight = h;
 }
 
 void CBoatPanel::OnMouse(wxMouseEvent &event)
 {
-	int _X = event.GetX();
-    int _Y = event.GetY();
+	event.Skip();
 }
 
 void CBoatPanel::UpdateViewPort()
@@ -208,7 +186,6 @@ void CBoatPanel::UpdateViewPort()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 	glOrtho(1.0, -1.0, -1.0, 1.0, 0.0, 0.0);
-    //glOrtho(0, ScreenWidth, ScreenHeight, 0, 0.0, 1.0f);
     glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
@@ -225,8 +202,8 @@ void CBoatPanel::Render()
 
 	if(Boat != NULL)
 	{
-		//glTranslatef(ScreenWidth/2,ScreenHeight/2,1.0f);
 		glPushMatrix();
+		glTranslatef(0.0,0.0,0.0f);
 		glScalef(0.8f,0.8f,1.0f);
 		Boat->Render();
 		glPopMatrix();
@@ -239,51 +216,18 @@ void CBoatPanel::Render()
 
 CBoats::CBoats()
 {
-	CBoat *Boat1 = new CBoat();
-	Boat1->SetName(GetMsg(MSG_SHIP1));
-	CBoatPoints *Boat1Points = new CBoatPoints();
-    Boat1Points->AddPoint(0.0,-1.0); 
-	Boat1Points->AddPoint(-0.3,-0.5); 
-	Boat1Points->AddPoint(-0.3,1.0); 
-	Boat1Points->AddPoint(0.3,1.0); 
-	Boat1Points->AddPoint(0.3,-0.5);
-	Boat1->AddGeometry(Boat1Points);
-
-	CBoat *Boat2 = new CBoat();
-	Boat2->SetName(GetMsg(MSG_SHIP2));
-	CBoatPoints *Boat2Points = new CBoatPoints();
-	Boat2Points->AddPoint(0.0,-1.0); 
-	Boat2Points->AddPoint(-0.25,-0.5);	
-	Boat2Points->AddPoint(-0.3,-0.3); 
-	Boat2Points->AddPoint(-0.3,0.7); 
-	Boat2Points->AddPoint(-0.2,1.0); 
-	Boat2Points->AddPoint(0.2,1.0); 
-	Boat2Points->AddPoint(0.3,0.7); 
-	Boat2Points->AddPoint(0.3,-0.3); 
-	Boat2Points->AddPoint(0.25,-0.5);	
-	Boat2->AddGeometry(Boat2Points);
-
-	CBoat *Boat3 = new CBoat();
-	Boat3->SetName(GetMsg(MSG_BOAT1));
-	CBoatPoints *Boat3Points = new CBoatPoints();
-	Boat3Points->AddPoint(0.0,-1.0); 
-	Boat3Points->AddPoint(-0.3,-0.2); 
-	Boat3Points->AddPoint(-0.3,0.7);	
-	Boat3Points->AddPoint(-0.2,1.0); 
-	Boat3Points->AddPoint(0.2,1.0); 
-	Boat3Points->AddPoint(0.3,0.7); 
-	Boat3Points->AddPoint(0.3,-0.2);	
-	Boat3->AddGeometry(Boat3Points);
 	
-	CBoat *Boat4 = new CBoat();
-	Boat4->SetName(GetMsg(MSG_BOAT2));
-	CBoatPoints *Boat4Points = new CBoatPoints();
-	Boat4Points->AddPoint(0.0,-1.0);	
-	Boat4Points->AddPoint(-0.3,-0.2);	
-	Boat4Points->AddPoint(-0.3,1.0); 
-	Boat4Points->AddPoint(0.3,1.0); 
-	Boat4Points->AddPoint(0.3,-0.2);	
-	Boat4->AddGeometry(Boat4Points);
+	CBoat *Boat = CreateBoat1();
+	Append(Boat);
+	Boat = CreateBoat2();
+	Append(Boat);
+	Boat = CreateBoat3();
+	Append(Boat);
+	Boat = CreateBoat4();
+	Append(Boat);
+
+	/*
+	
 	
 	CBoat *Boat5 = new CBoat();
 	Boat5->SetName(GetMsg(MSG_TRIANGLE));
@@ -292,12 +236,12 @@ CBoats::CBoats()
 	Boat5Points->AddPoint(-0.3,1.0); 
 	Boat5Points->AddPoint(0.3,1.0);
 	Boat5->AddGeometry(Boat5Points);
-		
-	Append(Boat2);
-	Append(Boat1);
-	Append(Boat3);
-	Append(Boat4);
-	Append(Boat5);
+	*/
+	
+	//Append(Boat3);
+	//Append(Boat4);
+	//Append(Boat5);
+	//Append(Boat6);
 	
 }
 

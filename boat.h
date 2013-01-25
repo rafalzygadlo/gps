@@ -6,29 +6,17 @@
 #include <vector>
 #include <GL/gl.h>
 #include "conf.h"
+#include "NaviGeometry.h"
 
 class CBoats;
 class CBoatPanel;
-class CBoatPoints
-{
-	std::vector <SPoint> vPoints;
-
-public:
-	
-	CBoatPoints();
-	~CBoatPoints();
-	void AddPoint(double x, double y);
-	SPoint GetPoint(size_t id);
-	size_t GetCount();
-
-};
 
 class CBoat
 {
 	CBoatPanel *BoatPanel;
+	CNaviGeometryGroup *BoatGeometryGroup;
 	size_t Type;
 	wxString Name;
-	wxArrayPtrVoid GeometryList;
 	void RenderGeometry(GLenum Mode,GLvoid* RawData,size_t DataLength);	
 
 public:
@@ -36,7 +24,11 @@ public:
 	CBoat();
 	~CBoat();
 
-	void AddGeometry(CBoatPoints *BoatPoints);
+	void NewGeometry();
+	CNaviGeometry *CreateGeometry();
+	void AddGeometry(CNaviGeometry *geometry);
+	CNaviVertexArray *CreateVertexArray();
+	
 	void *GetGeometry(size_t id);
 	size_t GetCount();
 	void SetName(wxString val);
@@ -45,6 +37,8 @@ public:
 	//SPoint GetPoint(size_t id);
 	wxPanel *GetBoatPanel();
 	void SetType(size_t type);
+	void RenderBackground();
+	void RenderBoat();
 	void Render();
 	
 };
