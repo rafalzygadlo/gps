@@ -49,42 +49,47 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *TopSizer = new wxBoxSizer(wxVERTICAL);
 	wxBoxSizer *CenterSizer = new wxBoxSizer(wxVERTICAL);
-	wxBoxSizer *BottomSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxFlexGridSizer *FlexSizer = new wxFlexGridSizer(2);
+	CenterSizer->Add(FlexSizer,0,wxALL|wxEXPAND,5);
+
+	wxBoxSizer *BottomSizer = new wxBoxSizer(wxVERTICAL);
 
 	PanelSizer->Add(TopSizer,0,wxEXPAND,0);
 	PanelSizer->Add(CenterSizer,0,wxEXPAND,0);
 	MainSizer->Add(BottomSizer,0,wxEXPAND,0);
 
-	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxFont font;
+	font.SetPointSize(TITLE_FONT_SIZE);
+	wxStaticText *LabelTop = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_SETTINGS) ,wxDefaultPosition,wxDefaultSize);
+	LabelTop->SetFont(font);
+	TopSizer->Add(LabelTop,0,wxALL,10);
+
+	wxStaticText *PortLabel = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_PORT));
+	FlexSizer->Add(PortLabel,0,wxALL,5);
+		
+	//font.SetPointSize(8);
+	wxBoxSizer *PortSizer = new wxBoxSizer(wxVERTICAL);
+	FlexSizer->Add(PortSizer,0,wxALL,0);
 	PortComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL);
 	PortComboBox->Disable();
-	ButtonSizer->Add(PortComboBox,1,wxALL|wxEXPAND,2);
-	
+	PortSizer->Add(PortComboBox,0,wxALL,5);
+	wxStaticText *ScanInfo = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_PORT_INFO));
+	PortSizer->Add(ScanInfo,0,wxALL|wxEXPAND,5);
+	Scan = new wxHyperlinkCtrl(Panel,ID_SCAN,GetMsg(MSG_SCAN),wxEmptyString);
+	//Scan->SetFont(font);
+	PortSizer->Add(Scan,0,wxALL,2);
+		
+	wxStaticText *BaudLabel = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_BAUD));
+	FlexSizer->Add(BaudLabel,0,wxALL,5);
 	BaudComboBox = new wxComboBox(Panel,ID_PORTS,wxEmptyString,wxDefaultPosition,wxDefaultSize,	NULL);
 	BaudComboBox->Disable();
-	ButtonSizer->Add(BaudComboBox,1,wxALL|wxEXPAND,2);
+	FlexSizer->Add(BaudComboBox,0,wxALL,5);
 
+	//FlexSizer->AddSpacer(1);
+	
+	
 	//button start
-	StartButton = new wxButton(Panel,ID_START,GetMsg(MSG_CONNECT),wxDefaultPosition,wxDefaultSize);
-	StartButton->Disable();
-	ButtonSizer->Add(StartButton,0,wxALL,2);
-
-	// button stop
-	StopButton = new wxButton(Panel,ID_STOP,GetMsg(MSG_DISCONNECT),wxDefaultPosition,wxDefaultSize);
-	StopButton->Disable();
-	ButtonSizer->Add(StopButton,0,wxALL,2);
-
-	TopSizer->Add(ButtonSizer,1,wxALL|wxEXPAND,2);
-
-	wxFont font;
-	font.SetPointSize(8);
-	
-	wxStaticText *ScanInfo = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_PORT_INFO));
-	TopSizer->Add(ScanInfo,0,wxALL|wxEXPAND,5);
-	Scan = new wxHyperlinkCtrl(Panel,ID_SCAN,GetMsg(MSG_SCAN),wxEmptyString);
-	Scan->SetFont(font);
-	TopSizer->Add(Scan,0,wxALL,2);
-	
+		
 	//wxStaticLine *line1 = new wxStaticLine(Panel,wxID_ANY);
 	//TopSizer->Add(line1,0,wxALL|wxEXPAND,0);
 	
@@ -105,24 +110,55 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 	//TopSizer->Add(Boat,0,wxALL,2);
 
 	//wxStaticLine *line2 = new wxStaticLine(Panel,wxID_ANY);
-	//TopSizer->Add(line2,0,wxALL|wxEXPAND,0);
+	//CenterSizer->Add(line2,0,wxALL|wxEXPAND,0);
 
-	wxBoxSizer *LeftSizer = new wxBoxSizer(wxHORIZONTAL);
-	CenterSizer->Add(LeftSizer,0,wxALL|wxEXPAND,5);
+	//wxBoxSizer *LeftSizer = new wxBoxSizer(wxHORIZONTAL);
+	//CenterSizer->Add(LeftSizer,0,wxALL|wxEXPAND,5);
 		
 	// log window check
 	bool chk_log;
 	FileConfig->Read(_(KEY_CHECK_LOG),&chk_log,false);
-	CheckLogBox = new wxCheckBox(Panel,ID_CHECK_LOG,GetMsg(MSG_SHOW_LOG),wxDefaultPosition,wxDefaultSize);
-	CheckLogBox->SetValue(chk_log);
-	CenterSizer->Add(CheckLogBox,0,wxALL,5);
+	//CheckLogBox = new wxCheckBox(Panel,ID_CHECK_LOG,GetMsg(MSG_SHOW_LOG),wxDefaultPosition,wxDefaultSize);
+	//CheckLogBox->SetValue(chk_log);
+	//CenterSizer->Add(CheckLogBox,0,wxALL,5);
 
 	// Log Window on center
 	LogText = new wxTextCtrl(Panel,wxID_ANY,wxEmptyString,wxDefaultPosition,wxDefaultSize,wxTE_MULTILINE);
 	LogText->Show(chk_log);
 	LogText->SetMinSize(wxSize(-1,200));
 	CenterSizer->Add(LogText,1,wxALL|wxEXPAND,5);
+	
+	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
+	ButtonSizer->AddStretchSpacer(1);
+	// button start
+	StartButton = new wxButton(this,ID_START,GetMsg(MSG_CONNECT),wxDefaultPosition,wxDefaultSize);
+	StartButton->Disable();
+	ButtonSizer->Add(StartButton,0,wxALL|wxALIGN_RIGHT,10);
 
+	// button stop
+	StopButton = new wxButton(this,ID_STOP,GetMsg(MSG_DISCONNECT),wxDefaultPosition,wxDefaultSize);
+	StopButton->Disable();
+	ButtonSizer->Add(StopButton,0,wxALL|wxALIGN_RIGHT,10);
+	BottomSizer->Add(ButtonSizer,0,wxALL|wxALIGN_RIGHT,0);
+	
+	wxStaticLine *line2 = new wxStaticLine(this,wxID_ANY);
+	BottomSizer->Add(line2,0,wxALL|wxEXPAND,0);
+	
+	// plugin name
+	wxBoxSizer *ButtonSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText *LabelProductInfo = new wxStaticText(this,wxID_ANY,GetProductInfo() ,wxDefaultPosition,wxDefaultSize);
+	ButtonSizer1->Add(LabelProductInfo,0,wxALL|wxEXPAND,10);
+		
+	// button close
+	ButtonSizer1->AddStretchSpacer(1);
+	wxButton *ButtonClose = new wxButton(this,wxID_OK,GetMsg(MSG_CLOSE),wxDefaultPosition,wxDefaultSize);
+	ButtonSizer1->Add(ButtonClose,0,wxALL|wxALIGN_RIGHT,10);
+	BottomSizer->Add(ButtonSizer1,0,wxALL|wxEXPAND,0);
+	Panel->SetSizer(PanelSizer);
+		
+	this->SetSizer(MainSizer);
+
+	
 	MySerial = MapPlugin->GetMySerial();
 	
 	if(MapPlugin->GetMySerial() != NULL)
@@ -141,21 +177,6 @@ CMyFrame::CMyFrame(CMapPlugin *_MapPlugin)
 		}
 	}
 	
-	
-	// plugin name
-	wxStaticText *LabelProductInfo = new wxStaticText(this,wxID_ANY,GetProductInfo() ,wxDefaultPosition,wxDefaultSize);
-	BottomSizer->Add(LabelProductInfo,0,wxALL|wxEXPAND,5);
-
-	// button close
-	BottomSizer->AddStretchSpacer(1);
-	wxButton *ButtonClose = new wxButton(this,wxID_OK,GetMsg(MSG_CLOSE),wxDefaultPosition,wxDefaultSize);
-	BottomSizer->Add(ButtonClose,0,wxALL|wxALIGN_RIGHT,10);
-
-	Panel->SetSizer(PanelSizer);
-
-	
-	this->SetSizer(MainSizer);
-
 	CMySerial *serial = _MapPlugin->GetMySerial();
 	wxString buf(_MapPlugin->GetMySerial()->GetPortName(),wxConvUTF8);
 	PortComboBox->SetValue(buf);

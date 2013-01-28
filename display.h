@@ -26,7 +26,7 @@ class NAVIDISPLAYAPI CDisplayPlugin: public CNaviDiaplayApi
 	bool IsDrawning;
 	CNaviBroker *Broker;
 	CMapPlugin *MapPlugin;
-	wxCheckListBox *TrackList;
+	wxListBox *TrackList;
 	wxListBox *TrackData;
 	wxPanel *Panel;
 	int Radius;
@@ -43,7 +43,10 @@ class NAVIDISPLAYAPI CDisplayPlugin: public CNaviDiaplayApi
 	wxString ConfigPath;
 	int _Radius;
 	wxListCtrl *List;
-	
+
+	wxPanel *OptionsPanel;
+	wxStaticText *LabelName, *LabelFileName, *LabelSize;
+
 	int GetControlType();
 	wxString GetCaption();
 	bool CheckGpsValid(wxGCDC &dc);
@@ -68,7 +71,6 @@ class NAVIDISPLAYAPI CDisplayPlugin: public CNaviDiaplayApi
 	void OnMenuRange(wxCommandEvent &event);
 	void OnMouseWheel(wxMouseEvent & event);
 	void OnMouse(wxMouseEvent & event);
-	void OnListCheck(wxCommandEvent &event);
 	void OnListBox(wxCommandEvent &event);
 	
 
@@ -103,6 +105,7 @@ public:
 		ID_SIGNALS,
 		// buttons DrawTracks
 		ID_DELETE,
+		ID_EDIT,
 		ID_TRACK_LIST,
 	};
 	

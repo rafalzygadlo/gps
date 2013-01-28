@@ -35,6 +35,7 @@ class CMyFrame;
 
 class CMapPlugin :public CNaviMapIOApi
 {
+	int BoatType;
 	CBoat *Boat;
 	CBoats *Boats;
 	bool MapPluginIsOn;
@@ -87,21 +88,23 @@ class CMapPlugin :public CNaviMapIOApi
 	double dMapCircle[3];
 	nvCircle MapCircle,GpsCircle;
 	bool _NoSignal;
+	CTrack *SelectedTrack;
 
 
 	bool IsPointInsideBox(double px, double py, double bx1, double by1, double bx2, double by2); 
 	void FoldLine( unsigned char *Buffer, int BufferLength );
 	void Parse(char *Buffer, int Length);
 	static void *MenuConfig(void *NaviMapIOApiPtr, void *Input);
+	static void *MenuTrack(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuBoatConfig(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuDistanceUnitConfig(void *NaviMapIOApiPtr, void *Input);
 	static void *MenuStatus(void *NaviMapIOApiPtr, void *Input);
-
+	
 	void CreateApiMenu(void);
 	void CreateSumbols();
 	void CreateTexture(TTexture *Texture, GLuint *TextureID);
 	void CreateTextures(void);
-	void RenderTracks();
+	void RenderSelectedTrack();
 	void RenderSelection();
 	void RenderPosition();
 	void RenderAnimation();
@@ -118,6 +121,7 @@ class CMapPlugin :public CNaviMapIOApi
 	void BoatConfig();
 	void DistanceUnitConfig();
 	void Status();
+	void TrackConfig();
 
 public:
 
@@ -140,11 +144,13 @@ public:
 	void NewSignalFunc();
 	void NoSignalFunc();
 	CTrackList *GetTrackList();
+	CTrack *GetTrack(size_t id);
 	nmeaINFO GetNmeaINFO();
 	CMySerial *GetMySerial();
 	bool GetIsWorking();
 	size_t GetUnit();
 	void SetUnit(size_t val);
+	void SetSelectedTrack(size_t id);
 
 
 	virtual void Run(void *Params);
@@ -156,9 +162,10 @@ public:
 		
 	// funkcje dostêpne dla innych pluginów
 	static void *SetNMEAInfo(void *NaviMapIOApiPtr, void *Params);
-	static void *SetLog(void *NaviMapIOApiPtr, void *Params);				// ustawia log w okienku konfiguracyjnym
-	static void *NewSignal(void *NaviMapIOApiPtr, void *Params);
+	static void *SetLog(void *NaviMapIOApiPtr, void *Params);			// ustawia log w okienku konfiguracyjnym
+	static void *NewSignal(void *NaviMapIOApiPtr, void *Params);		
 	static void *NoSignal(void *NaviMapIOApiPtr, void *Params);			// ustawia port w okienku konfiguracyjnym
+	static void *GetThisPtr(void *NaviMapIOApiPtr, void *Params);		// zwraca this ptr
 	
 };	
 

@@ -1,17 +1,15 @@
 #include <wx/hyperlink.h>
-#include "unitconfig.h"
+#include "trackconfig.h"
 #include "tools.h"
 #include "conf.h"
 
-BEGIN_EVENT_TABLE(CUnitConfig,wxDialog)
-	EVT_RADIOBUTTON(wxID_ANY,CUnitConfig::OnRadio)
+BEGIN_EVENT_TABLE(CTrackConfig,wxDialog)
 END_EVENT_TABLE()
 
-CUnitConfig::CUnitConfig()
+CTrackConfig::CTrackConfig()
 :wxDialog( NULL,wxID_ANY, GetProductName(), wxDefaultPosition, wxDefaultSize )
 {
-	Unit = 0;
-	
+		
 	wxBoxSizer *MainSizer = new wxBoxSizer(wxVERTICAL);
 	
 	wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
@@ -22,17 +20,10 @@ CUnitConfig::CUnitConfig()
 	wxFont font;
 	font.SetPointSize(TITLE_FONT_SIZE);
 	
-	wxStaticText *LabelDistance = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_DISTANCE_UNITS) ,wxDefaultPosition,wxDefaultSize);
+	wxStaticText *LabelDistance = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_NEW_TRACK_RECORD) ,wxDefaultPosition,wxDefaultSize);
 	LabelDistance->SetFont(font);
 	PanelSizer->Add(LabelDistance,0,wxALL,5);
 		
-	for(size_t i = 0; i < nvDistanceSize;i++)
-	{ 
-		wxRadioButton *Radio = new wxRadioButton(Panel,ID_RADIO + i,wxString::Format(_("%s - %s"), GetDistanceName(i).wc_str(), GetDistanceUnit(i).wc_str() ),wxDefaultPosition,wxDefaultSize);
-		Radios.Add(Radio);
-		PanelSizer->Add(Radio,0,wxALL,5);
-	}
-	
 	MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
 	
 	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -54,22 +45,22 @@ CUnitConfig::CUnitConfig()
 	
 }
 
-CUnitConfig::~CUnitConfig()
+CTrackConfig::~CTrackConfig()
 {
 	Radios.Clear();
 }
 
-void CUnitConfig::OnRadio(wxCommandEvent &event)
+void CTrackConfig::OnRadio(wxCommandEvent &event)
 {
 	Unit = event.GetId() - ID_RADIO;
 }
 
-size_t CUnitConfig::GetUnit()
+size_t CTrackConfig::GetUnit()
 {
 	return Unit;
 }
 
-void CUnitConfig::SetUnit(size_t val)
+void CTrackConfig::SetUnit(size_t val)
 {
 	
 	Unit = val;

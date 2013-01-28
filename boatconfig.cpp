@@ -14,19 +14,28 @@ CBoatConfig::CBoatConfig()
 	
 	wxBoxSizer *MainSizer = new wxBoxSizer(wxVERTICAL);
 	
-	wxBoxSizer *PanelSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
 	wxPanel *Panel = new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-	//Panel->SetBackgroundColour(wxColor(255,255,255));
+	Panel->SetBackgroundColour(wxColor(255,255,255));
 	Panel->SetSizer(PanelSizer);
 		
+	wxFont font;
+	font.SetPointSize(TITLE_FONT_SIZE);
+	wxBoxSizer *TopSizer = new wxBoxSizer(wxVERTICAL);
+	PanelSizer->Add(TopSizer,0,wxALL,5);
+	wxStaticText *LabelDistance = new wxStaticText(Panel,wxID_ANY,GetMsg(MSG_BOAT_CONFIG) ,wxDefaultPosition,wxDefaultSize);
+	LabelDistance->SetFont(font);
+	TopSizer->Add(LabelDistance,0,wxALL,5);
+	
+	wxBoxSizer *HSizer = new wxBoxSizer(wxHORIZONTAL);
+	PanelSizer->Add(HSizer,1,wxALL|wxEXPAND,5);
 	BoatPanel = new CBoatPanel(Panel);
-	PanelSizer->Add(BoatPanel,1,wxALL|wxEXPAND,5);
+	HSizer->Add(BoatPanel,1,wxALL|wxEXPAND,5);
 	BoatPanel->SetSize(200,200);
 	
 	ListBoat = new wxListBox(Panel,ID_BOAT,wxDefaultPosition,wxDefaultSize);
-	PanelSizer->Add(ListBoat,1,wxALL|wxEXPAND,5);
-
-
+	HSizer->Add(ListBoat,1,wxALL|wxEXPAND,5);
+	
 	MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
 	
 	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
@@ -69,4 +78,10 @@ size_t CBoatConfig::GetId()
 void CBoatConfig::OnBoat(wxCommandEvent &event)
 {
 	BoatPanel->SetBoat(Boats->GetBoat(event.GetSelection()));
+}
+
+void CBoatConfig::SetId(size_t id)
+{
+	BoatPanel->SetBoat(Boats->GetBoat(id));
+	ListBoat->SetSelection(id);
 }

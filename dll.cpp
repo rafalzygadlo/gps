@@ -32,10 +32,11 @@ unsigned char pib[] =
 0x2f,0x3d,0x61,0xfb,0xc8,0x18
 };
 
-wxMutex mutex;
+
 CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 {
 	ConfigPath = wxString::Format(wxT("%s%s"),GetWorkDir().wc_str(),_(PLUGIN_CONFIG_FILE));
+	
 	GpsX = GpsY = _X = _Y = _UX = _UY = GPS_OUT_OF_COORDS;
 	DisplaySignal = new CDisplaySignal(NDS_GPS);
 	nmea_zero_INFO(&NmeaInfo);
@@ -53,41 +54,48 @@ CMapPlugin::CMapPlugin(CNaviBroker *NaviBroker):CNaviMapIOApi(NaviBroker)
 	MySerial = NULL;
 	AnimMarkerSize = 5.0f;
 	TexturesCreated = false;
+	SelectedTrack = NULL;
 	CreateSumbols();
 	CreateApiMenu();
+	
+	ReadConfig();
+		
 	Track = new CTrack();
 	TrackList = new CTrackList();
 	TrackList->AddTrack(Track);
-	
 	Boats = new CBoats();
-	Boat = Boats->GetBoat(0);
-
-
+	Boat = Boats->GetBoat(BoatType);
+	
 	DistanceUnit = 0;
-	ReadConfig();
 	_NoSignal = true;
-	//GetBroker()->StartAnimation(true, GetBroker()->GetParentPtr());
 
 	// MAX function name 32
-//	AddExecuteFunction("gps_SetExit", SetExit);
+
 	AddExecuteFunction("gps_SetNMEAInfo",SetNMEAInfo);
 	AddExecuteFunction("gps_SetLog",SetLog);
 	AddExecuteFunction("gps_NewSignal",NewSignal);
 	AddExecuteFunction("gps_NoSignal",NoSignal);
+	AddExecuteFunction("gps_GetThisPtr",GetThisPtr);
 
-//	AddExecuteFunction("gps_SetPort",SetPort);
-//	AddExecuteFunction("gps_SetBaud",SetBaud);
+	//DisplaySignal->SetData((void*)this,sizeof(this));
+	//GetBroker()->SendDisplaySignal((void*)DisplaySignal);
+
 }
 
 CMapPlugin::~CMapPlugin()
 {
 	delete DisplaySignal;
-	//delete Track;
-	//delete TrackList;
+	delete Track;
+	delete TrackList;
 	delete MyFrame;
 	delete Boats;
 	MyFrame = NULL;
 	MySerial = NULL;
+}
+
+CTrack *CMapPlugin::GetTrack(size_t id)
+{
+	return TrackList->GetTrack(id);
 }
 
 bool CMapPlugin::GetIsWorking()
@@ -104,6 +112,7 @@ void CMapPlugin::ReadConfig()
 {
 	wxFileConfig *FileConfig = new wxFileConfig(_("gps"),wxEmptyString,ConfigPath,wxEmptyString);
 	FileConfig->Read(_(KEY_DISTANCE_UNIT), &DistanceUnit,nvNauticMiles);
+	FileConfig->Read(_(KEY_BOAT_TYPE),&BoatType,0);
 	delete FileConfig;
 
 }
@@ -121,6 +130,7 @@ void CMapPlugin::WriteConfig()
 	FileConfig->Write(_(KEY_PORT),port);
 	FileConfig->Write(_(KEY_BAUD),baud);
 	FileConfig->Write(_(KEY_RUNNING),running);
+	FileConfig->Write(_(KEY_BOAT_TYPE),BoatType);
 	
 	delete FileConfig;
 }
@@ -249,6 +259,7 @@ void CMapPlugin::CreateApiMenu(void)
 
 	NaviApiMenu = new CNaviApiMenu( GetMsg(MSG_GPS).wchar_str() );	// nie u¿uwaæ delete - klasa zwalnia obiejt automatycznie
 	NaviApiMenu->AddItem( GetMsg(MSG_SETTINGS).wchar_str(),this, MenuConfig );
+	NaviApiMenu->AddItem( GetMsg(MSG_NEW_TRACK_RECORD).wchar_str(),this, MenuTrack );
 	NaviApiMenu->AddItem( GetMsg(MSG_BOAT_CONFIG).wchar_str(),this, MenuBoatConfig );
 	NaviApiMenu->AddItem( GetMsg(MSG_DISTANCE_UNIT_CONFIG).wchar_str(),this, MenuDistanceUnitConfig );
 	NaviApiMenu->AddItem( GetMsg(MSG_STATUS).wchar_str(),this, MenuStatus );
@@ -285,6 +296,20 @@ void CMapPlugin::Config()
 
 }
 
+void *CMapPlugin::MenuTrack(void *NaviMapIOApiPtr, void *Input) 
+{
+
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	ThisPtr->TrackConfig();
+
+	return NULL;
+}
+
+void CMapPlugin::TrackConfig()
+{
+
+}
+
 void *CMapPlugin::MenuBoatConfig(void *NaviMapIOApiPtr, void *Input) 
 {
 
@@ -298,7 +323,14 @@ void CMapPlugin::BoatConfig()
 {
 
 	CBoatConfig *BoatConfig = new CBoatConfig();
-	BoatConfig->ShowModal();
+	BoatConfig->SetId(BoatType);
+	
+	if(BoatConfig->ShowModal() == wxID_OK)
+	{
+		BoatType = BoatConfig->GetId();
+		Boat = Boats->GetBoat(BoatType);
+	}
+	
 	delete BoatConfig;
 }
 
@@ -412,10 +444,10 @@ void CMapPlugin::SetLogFunc(char *text)
 	if(MyFrame == NULL)
 		return;
 	
-	mutex.Lock();
+	GetMutex()->Lock();
 	wxString buffer(text,wxConvUTF8,4096);
 	MyFrame->SetLogEvent(buffer);
-	mutex.Unlock();
+	GetMutex()->Unlock();
 	
 }
 
@@ -435,6 +467,13 @@ void CMapPlugin::NewSignalFunc()
 	
 }
 
+void *CMapPlugin::GetThisPtr(void *NaviMapIOApiPtr, void *Params)
+{
+	CMapPlugin *ThisPtr = (CMapPlugin*)NaviMapIOApiPtr;
+	return ThisPtr;
+}
+
+
 void *CMapPlugin::NoSignal(void *NaviMapIOApiPtr, void *Params)
 {
 
@@ -449,7 +488,11 @@ void CMapPlugin::NoSignalFunc()
 	_NoSignal = true;
 }
 
-
+void CMapPlugin::SetSelectedTrack(size_t id)
+{
+	SelectedTrack = TrackList->GetTrack(id);	
+	Broker->Refresh(Broker->GetParentPtr());
+}
 
 //void *CMapPlugin::SetPort(void *NaviMapIOApiPtr, void *Params)
 //{
@@ -629,12 +672,12 @@ void CMapPlugin::SetUnit(size_t val)
 void CMapPlugin::AddPoint(double x, double y, nmeaINFO *info)
 {
 
-	mutex.Lock();
+	GetMutex()->Lock();
 #ifdef BUILD_GPS_POINTS_VECTOR
-	//Track->AddPoint(x,y);
-	//Track->AddPointInfo(x,y,info);
+	Track->AddPoint(x,y);
+	Track->AddPointInfo(x,y,info);
 #endif
-	mutex.Unlock();
+	GetMutex()->Unlock();
 
 }
 double CMapPlugin::GetGpsX()
@@ -700,28 +743,26 @@ float CMapPlugin::RenderText(double x, double y, char *text)
 	return height;
 }
 
-void CMapPlugin::RenderTracks()
+void CMapPlugin::RenderSelectedTrack()
 {
+	if(SelectedTrack == NULL)
+		return;
+	
 	glEnable(GL_POINT_SMOOTH);
 	
-	mutex.Lock();
-	std::vector<CTrack*> Tracks = TrackList->GetList();
+	GetMutex()->Lock();
 	
-	for(int i = 0; i < Tracks.size() ;i++)
-	{
-		glColor4f(1.0f,0.0f,0.0f,0.5f);
-		glPointSize(5.0f);
+	glColor4f(1.0f,0.0f,0.0f,0.2f);
+	glPointSize(5.0f);
 		
-		std::vector<SPoint> pts = Tracks[i]->GetTrackPoints();
-		if(pts.size() > 0)
-		{
-			RenderGeometry(GL_POINTS,&pts[0],pts.size());				// punkty z gpsa
-			RenderGeometry(GL_LINE_STRIP,&pts[0], pts.size());			// linie
-		}
-    }
-	
-	mutex.Unlock();
-	
+	std::vector<SPoint> pts = SelectedTrack->GetTrackPoints();
+	if(pts.size() > 0)
+	{
+		RenderGeometry(GL_POINTS,&pts[0],pts.size());				// punkty z gpsa
+		RenderGeometry(GL_LINE_STRIP,&pts[0], pts.size());			// linie
+	}
+	    	
+	GetMutex()->Unlock();
 	glDisable(GL_POINT_SMOOTH);
 
 }
@@ -872,11 +913,12 @@ void CMapPlugin::Render(void)
 		RenderSelection();
 		RenderMouseXY();
 		RenderDistance();
+		
 	}
         
+	RenderSelectedTrack();
 	//RenderAnimation();	
-	//RenderTracks();
-		
+			
     glDisable(GL_BLEND);
     glDisable(GL_LINE_SMOOTH);
 

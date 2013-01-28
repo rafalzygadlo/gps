@@ -9,7 +9,6 @@ BEGIN_EVENT_TABLE(CDisplayPlugin,CNaviDiaplayApi)
 	EVT_MOUSE_EVENTS(CDisplayPlugin::OnMouse)
 	EVT_MENU_RANGE(ID_MENU_BEGIN,ID_MENU_END,CDisplayPlugin::OnMenuRange)
 	EVT_MOUSEWHEEL(CDisplayPlugin::OnMouseWheel)
-	EVT_CHECKLISTBOX(ID_TRACK_LIST, CDisplayPlugin::OnListCheck)
 	EVT_LISTBOX(ID_TRACK_LIST, CDisplayPlugin::OnListBox)
 END_EVENT_TABLE()
 
@@ -47,7 +46,7 @@ CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& p
 	ArrayOfTypes.Add(_("Quality"));
 	ArrayOfTypes.Add(_("Sattelites"));
 	ArrayOfTypes.Add(_("Status"));
-	//ArrayOfTypes.Add(_("Tracks"));
+	ArrayOfTypes.Add(_("Tracks"));
 	//ArrayOfTypes.Add(_("Status"));
 		
 	if(!FileConfig->Read(wxString::Format(_("%s/%s"),Name.wc_str(),_(KEY_CONTROL_TYPE)),&ControlType))
@@ -57,7 +56,8 @@ CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& p
 	if(!FileConfig->Read(wxString::Format(_("%s/%s"),Name.wc_str(),_(KEY_FORMAT_TYPE)),&FormatType))
 		FormatType = DEFAULT_FORMAT;
 
-	Caption = 	GetCaption();
+	Caption = GetCaption();
+
 	delete FileConfig;
 
 };
@@ -164,22 +164,25 @@ void CDisplayPlugin::OnMouse(wxMouseEvent & event)
 	event.Skip();
 }
 
-void CDisplayPlugin::OnListCheck(wxCommandEvent &event)
-{	
-	bool checked = TrackList->IsChecked(event.GetSelection());
-//	GpsDLL->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
-}
+//void CDisplayPlugin::OnListCheck(wxCommandEvent &event)
+//{	
+	//bool checked = TrackList->IsChecked(event.GetSelection());
+	//MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
+//}
 
 void CDisplayPlugin::OnListBox(wxCommandEvent &event)
 {	
-	TrackData->Clear();
-	std::vector<SPointInfo> info = MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->GetTrack();
-	for(int i = 0; i < info.size();i++)
-		TrackData->Append(wxString::Format(_("%4.2f %4.2f"),info[i].nmea_info.lat,info[i].nmea_info.lat));
+	GetMutex()->Lock();
+	OptionsPanel->Show();
+	this->Layout();
 	
-	bool checked = TrackList->IsChecked(event.GetSelection());
+	CTrack *Track = MapPlugin->GetTrack(event.GetSelection());
+	LabelName->SetLabel(Track->GetName());
+	LabelFileName->SetLabel(Track->GetFileName());
+		
+	MapPlugin->SetSelectedTrack(event.GetSelection());
 
-	MapPlugin->GetTrackList()->GetList()[event.GetSelection()]->SetVisible(checked);
+	GetMutex()->Unlock();
 }
 
 void CDisplayPlugin::DrawStatus(wxGCDC &dc)
@@ -381,30 +384,56 @@ void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 	if(Panel != NULL)
 		return; // nie rysuj kontrolek
 	
-	wxBoxSizer *MainSizer = new wxBoxSizer(wxHORIZONTAL);
+	wxBoxSizer *MainSizer = new wxBoxSizer(wxVERTICAL);
 	Panel = new wxPanel(this,wxID_ANY,wxDefaultPosition,wxDefaultSize);
 		
 	wxBoxSizer *PanelSizer = new wxBoxSizer(wxVERTICAL);
 		
-	TrackList = new wxCheckListBox(Panel,ID_TRACK_LIST,wxDefaultPosition,wxDefaultSize);
-	PanelSizer->Add(TrackList,1,wxALL|wxEXPAND,5);
-	TrackData = new wxListBox(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
-	PanelSizer->Add(TrackData,1,wxALL|wxEXPAND,5);
+	TrackList = new wxListBox(Panel,ID_TRACK_LIST,wxDefaultPosition,wxDefaultSize);
+	PanelSizer->Add(TrackList,1,wxALL|wxEXPAND,0);
+	//TrackData = new wxListBox(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
+	//PanelSizer->Add(TrackData,1,wxALL|wxEXPAND,5);
 	
-	wxListCtrl *List = new wxListCtrl(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxLC_REPORT);
-	List->InsertColumn(0,_("aaa"));
-	List->InsertColumn(0,_("aaa"));
-	PanelSizer->Add(List,1,wxALL|wxEXPAND,5);
+	//wxListCtrl *List = new wxListCtrl(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize,wxLC_REPORT);
+	//List->InsertColumn(0,_("aaa"));
+	//List->InsertColumn(0,_("aaa"));
+	//PanelSizer->Add(List,1,wxALL|wxEXPAND,5);
 
 	MainSizer->Add(Panel,1,wxALL|wxEXPAND,0);
 	Panel->SetSizer(PanelSizer);
 
-	wxBoxSizer *Panel1Sizer = new wxBoxSizer(wxVERTICAL);
+	wxBoxSizer *Panel1Sizer = new wxBoxSizer(wxHORIZONTAL);
 	wxPanel *Panel1 = new wxPanel(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
 	PanelSizer->Add(Panel1,0,wxALL|wxEXPAND,5);
+
+	OptionsPanel = new wxPanel(Panel,wxID_ANY,wxDefaultPosition,wxDefaultSize);
+	PanelSizer->Add(OptionsPanel,0,wxALL|wxEXPAND,0);
+	//OptionsPanel->Hide();
+
+	wxBoxSizer *OptionsPanelSizer = new wxBoxSizer(wxVERTICAL);
+	OptionsPanel->SetSizer(OptionsPanelSizer);
+
+	wxFont font;
+	font.SetPointSize(14);
+
+	LabelName = new wxStaticText(OptionsPanel,wxID_ANY,wxEmptyString);
+	LabelName->SetFont(font);
+	OptionsPanelSizer->Add(LabelName,0,wxALL|wxEXPAND,2);
+	
+	LabelFileName = new wxStaticText(OptionsPanel,wxID_ANY,wxEmptyString);
+	OptionsPanelSizer->Add(LabelFileName,0,wxALL|wxEXPAND,2);
+
+	LabelSize = new wxStaticText(OptionsPanel,wxID_ANY,wxEmptyString);
+	OptionsPanelSizer->Add(LabelSize,0,wxALL|wxEXPAND,2);
 		
-	wxButton *Delete = new wxButton(Panel1,ID_DELETE,_("Delete"),wxDefaultPosition,wxDefaultSize);
-	Panel1Sizer->Add(Delete,0,wxALL,5);
+	wxBoxSizer *ButtonSizer = new wxBoxSizer(wxHORIZONTAL);
+	OptionsPanelSizer->Add(ButtonSizer,0,wxALL|wxEXPAND,2);
+	wxButton *Edit = new wxButton(OptionsPanel,ID_EDIT,_("Edit"),wxDefaultPosition,wxDefaultSize);
+	ButtonSizer->Add(Edit,0,wxALL,5);
+
+	wxButton *Delete = new wxButton(OptionsPanel,ID_DELETE,_("Delete"),wxDefaultPosition,wxDefaultSize);
+	ButtonSizer->Add(Delete,0,wxALL,5);
+
 	Panel1->SetSizer(Panel1Sizer);
 		
 	this->SetSizer(MainSizer);
@@ -415,10 +444,7 @@ void CDisplayPlugin::DrawTracks(wxGCDC &dc)
 		
 		for(int i = 0; i< Tracks.size(); i++)
 		{	
-			TrackList->Append(wxString::Format(_("%s"), Tracks[i]->GetTrackName().wc_str()));
-		
-			if(Tracks[i]->GetVisible())
-				TrackList->Check(i,true);
+			TrackList->Append(wxString::Format(_("%s"), Tracks[i]->GetName().wc_str()));
 		}
 	}
 		
@@ -785,6 +811,7 @@ bool CDisplayPlugin::IsValidSignal(CDisplaySignal *SignalID) {
 	if(SignalID->GetSignalID() == NDS_BROKER_BROADCAST && Broker == NULL)
 	{
 		Broker = (CNaviBroker*)SignalID->GetData();
+		MapPlugin = (CMapPlugin*)Broker->ExecuteFunction(Broker->GetParentPtr(),"gps_GetThisPtr",NULL);
 		return false;
 	}
 

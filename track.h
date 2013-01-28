@@ -14,8 +14,7 @@ class CTrack
 		std::vector <SPointInfo>  vPointInfo;
 		std::vector <SPoint> vPoint;
 		bool Visible;
-		void SaveToFile();
-		
+				
 	public:
 		CTrack();
 		~CTrack();
@@ -27,10 +26,10 @@ class CTrack
 		void AddPointInfo(double x, double y, nmeaINFO *info);
 		void LoadFromFile(wxString filename);
 		wxString GetFileName();
-		wxString GetTrackName();
+		wxString GetName();
 		bool GetVisible();
 		void SetVisible(bool value);
-		
+		void SaveToFile();
 		void Render();
 };
 
@@ -43,6 +42,7 @@ class CTrackList
 	public:
 	
 		void AddTrack(CTrack *track);
+		CTrack *GetTrack(size_t id);
 		std::vector<CTrack*> CTrackList::GetList();
 		size_t GetSize();
 		CTrackList();

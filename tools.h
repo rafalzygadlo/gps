@@ -22,6 +22,7 @@ wxString GetDistanceUnit(size_t id);
 wxString GetDistanceName(size_t id);
 wxString GetProductInfo();
 wxString GetProductName();
+wxMutex *GetMutex();
 
 CBoat* CreateBoat1();
 CBoat* CreateBoat2();

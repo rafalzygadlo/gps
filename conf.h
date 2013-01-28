@@ -31,6 +31,7 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define KEY_BAUD			"baud"
 #define KEY_CHECK_LOG		"log"
 #define KEY_RUNNING			"running"
+#define KEY_BOAT_TYPE		"boatType"
 
 #define MIN_RECT_HEIGHT 100		// minimalna wysokoœc zaznaczenia
 #define MIN_RECT_WIDTH 100		// minimalna szerokoœæ zaznaczenia
@@ -85,6 +86,8 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define MSG_CONNECTED				27
 #define MSG_NMEA_LINES				28
 #define MSG_SIGNAL_QUALITY			29
+#define MSG_NEW_TRACK_RECORD		30
+
 
 
 #define nvPI 3.1415926535897932384626433832795
@@ -143,15 +146,12 @@ typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};
 #define NV_PI 3.1415926535897932384626433
 enum nvDistanceUnits { nvNauticMiles, nvKilometer, nvMeter, nvDistanceSize = 3 };
 
-#define SHIP1_SIZE	6
-#define SHIP2_SIZE	6
-#define SHIP3_SIZE	8
+#define TITLE_FONT_SIZE 8
 
 struct SPoint
 {
 	double x;
 	double y;
-
 };
  
 typedef struct
@@ -170,7 +170,6 @@ typedef struct
 	int colorR;
 	int colorG;
 	int colorB;
-	
 
 } STrackHeader;
 

@@ -17,6 +17,7 @@ public:
 	CBoatConfig();
 	~CBoatConfig();
 	size_t GetId();
+	void SetId(size_t id);
 		
 	DECLARE_EVENT_TABLE();
 	

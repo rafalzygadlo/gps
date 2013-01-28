@@ -81,6 +81,7 @@ void CMySerial::OnExit()
 void CMySerial::OnStart()
 {
 	_IsRunning = true;
+	
 }
 
 void CMySerial::OnStop()

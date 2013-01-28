@@ -136,10 +136,8 @@ BEGIN_EVENT_TABLE(CBoatPanel,wxGLCanvas)
 	EVT_MOUSE_EVENTS(CBoatPanel::OnMouse)
 END_EVENT_TABLE()
 
-
 CBoatPanel::CBoatPanel(wxWindow *parent)
 :wxGLCanvas( parent, (wxGLCanvas*) NULL, wxID_ANY, wxDefaultPosition, wxDefaultSize,wxFULL_REPAINT_ON_RESIZE)
- 
 {
 	GLContext = new wxGLContext(this);
 	Boat = NULL;

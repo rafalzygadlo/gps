@@ -17,9 +17,9 @@ CTrack::~CTrack()
 void CTrack::AddPointInfo(double x, double y, nmeaINFO *info)
 {
 	SPointInfo Track;
+	memset(&Track,0,sizeof(SPointInfo));
     Track.x = x;
     Track.y = y;
-	memset(&Track,0,sizeof(nmeaINFO));
 	memcpy(&Track.nmea_info,info,sizeof(nmeaINFO));
     vPointInfo.push_back(Track);
 }
@@ -54,7 +54,7 @@ void CTrack::LoadFromFile(wxString filename)
 			{	
 				file.Read(&buffer->x,sizeof(double));
 				file.Read(&buffer->y,sizeof(double));
-				file.Read(buffer,sizeof(nmeaINFO));
+				file.Read(&buffer->nmea_info,sizeof(nmeaINFO));
 				AddPoint(buffer->x,buffer->y);
 				AddPointInfo(buffer->x,buffer->y,&buffer->nmea_info);
 			}
@@ -67,11 +67,17 @@ void CTrack::LoadFromFile(wxString filename)
 
 void CTrack::SaveToFile()
 {
-	return;
+	
 	if(vPointInfo.size() > 0)
 	{
 		wxFile file;
-		wxString filename = GenerateRandomFileName(GetWorkDir(),_(TRACK_FILE_EXTENSION),10);
+		wxString filename; 
+		
+		if(FileName == wxEmptyString)
+			filename = GenerateRandomFileName(GetWorkDir(),_(TRACK_FILE_EXTENSION),10);
+		else
+			filename = FileName;
+		
 		STrackHeader Header;
 		wcscpy(Header.track_name,TrackName.wc_str());
 		Header.visible = Visible;
@@ -108,7 +114,7 @@ wxString CTrack::GetFileName()
 
 }
 
-wxString CTrack::GetTrackName()
+wxString CTrack::GetName()
 {
 	return TrackName;
 }
@@ -137,6 +143,10 @@ CTrackList::CTrackList()
 
 CTrackList::~CTrackList()
 {
+	//for(size_t i = 0; i < vTracks.size(); i++)
+	//{
+		//vTracks[i]->SaveToFile();
+	//}
 
 }
 void CTrackList::AddTrack(CTrack *track)
@@ -169,6 +179,11 @@ void CTrackList::LoadTracks()
 std::vector<CTrack*> CTrackList::GetList() 
 {
 	return vTracks;
+}
+
+CTrack* CTrackList::GetTrack(size_t id) 
+{
+	return vTracks[id];
 }
 
 size_t CTrackList::GetSize() 

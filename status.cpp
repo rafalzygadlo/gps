@@ -27,6 +27,16 @@ CStatus::CStatus(CMySerial *serial)
 	wxBoxSizer *Panel1Sizer = new wxBoxSizer(wxVERTICAL);
 	
 	Panel1->SetSizer(Panel1Sizer);
+
+
+	wxFont font;
+	font.SetPointSize(TITLE_FONT_SIZE);
+	wxBoxSizer *TopSizer = new wxBoxSizer(wxVERTICAL);
+	Panel1Sizer->Add(TopSizer,0,wxALL,5);
+	wxStaticText *LabelDistance = new wxStaticText(Panel1,wxID_ANY,GetMsg(MSG_STATUS) ,wxDefaultPosition,wxDefaultSize);
+	LabelDistance->SetFont(font);
+	TopSizer->Add(LabelDistance,0,wxALL,5);
+
 		
 	wxTextCtrl *Status = new wxTextCtrl(Panel1,wxID_ANY,wxEmptyString,wxDefaultPosition,wxSize(400,200),wxTE_MULTILINE | wxTE_READONLY |wxTE_CAPITALIZE);
 	Panel1Sizer->Add(Status,0,wxALL|wxEXPAND,0);

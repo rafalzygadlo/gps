@@ -4,7 +4,8 @@
 
 
 int GlobalLanguageID;
-const wxChar *nvLanguage[2][30] = 
+wxMutex *mutex = new wxMutex;
+const wxChar *nvLanguage[2][31] = 
 { 
 	/*EN*/
 	{
@@ -12,12 +13,12 @@ const wxChar *nvLanguage[2][30] =
 		_("Disconnect"),
 		_("Port scanning on demand.\nWe do not check the available ports automatically because for some devices such as bluetooth,\nit takes a long time and it looks as if the program has crashed.\nThat's why we provide manual search for ports."),
 		_("Scan for available ports"),
-		_("Ok"),
+		_("Close"),
 		_("Show Log Window"),
 		_("Scaning ports. Please wait."),
 		_("Gps is not configured. Go to Settings -> GPS."),
-		_("Port"),
-		_("Baud"),
+		_("Port name"),
+		_("Baud speed"),
 		_("Show signals"),
 		_("Font %s not found in program folder.\nCopy font file to the program folder and start plugin again."),
 		_("Distance unit"),
@@ -37,7 +38,9 @@ const wxChar *nvLanguage[2][30] =
 		_("Gps STATUS"),
 		_("Connected"),
 		_("Number of NMEA lines"),
-		_("Signal Quality")
+		_("Signal Quality"),
+		_("Gps RECORD TRACK"),
+
 
 		
 		
@@ -87,6 +90,11 @@ const wxChar *nvDistanceU[2][3] =
 	}
 
 };
+
+wxMutex *GetMutex()
+{
+	return mutex;
+}
 
 wxString GetProductInfo()
 {
