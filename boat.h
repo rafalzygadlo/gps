@@ -38,7 +38,7 @@ public:
 	wxPanel *GetBoatPanel();
 	void SetType(size_t type);
 	void RenderBackground();
-	void RenderBoat();
+	void RenderBoat(bool points = false);
 	void Render();
 	
 };

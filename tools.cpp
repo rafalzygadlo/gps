@@ -40,8 +40,6 @@ const wxChar *nvLanguage[2][31] =
 		_("Number of NMEA lines"),
 		_("Signal Quality"),
 		_("Gps RECORD TRACK"),
-
-
 		
 		
 	},

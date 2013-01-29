@@ -86,7 +86,7 @@ void CBoat::RenderBackground()
 
 }
 
-void CBoat::RenderBoat()
+void CBoat::RenderBoat(bool points)
 {
 	for(size_t i = 0; i < BoatGeometryGroup->Length(); i++)
 	{
@@ -102,11 +102,15 @@ void CBoat::RenderBoat()
 
 			glColor4f(0.0f,0.0f,1.0f,0.2f);
 			RenderGeometry(GL_POLYGON,VertexArray->GetRawArray(),VertexArray->Length());
-						
-			glPointSize(8);
-			glColor4f(1.0f,0.0f,0.0f,0.2f);
-			RenderGeometry(GL_POINTS,VertexArray->GetRawArray(),VertexArray->Length());
-			glPointSize(1);
+			
+			if(points)
+			{			
+				glPointSize(8);
+				glColor4f(1.0f,0.0f,0.0f,0.2f);
+				RenderGeometry(GL_POINTS,VertexArray->GetRawArray(),VertexArray->Length());
+				glPointSize(1);
+			}
+			
 			Geometry->Next();
 		}
 	}
@@ -122,7 +126,7 @@ void CBoat::Render()
 	glTranslatef(0.0,0.0,0.0);
 	
 	RenderBackground();
-	RenderBoat();
+	RenderBoat(true);
 	
 	glDisable(GL_POINT_SMOOTH);
 	glDisable(GL_BLEND);
