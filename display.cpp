@@ -46,7 +46,7 @@ CDisplayPlugin::CDisplayPlugin(wxWindow* parent, wxWindowID id, const wxPoint& p
 	ArrayOfTypes.Add(_("Quality"));
 	ArrayOfTypes.Add(_("Sattelites"));
 	ArrayOfTypes.Add(_("Status"));
-	ArrayOfTypes.Add(_("Tracks"));
+	//ArrayOfTypes.Add(_("Tracks"));
 	//ArrayOfTypes.Add(_("Status"));
 		
 	if(!FileConfig->Read(wxString::Format(_("%s/%s"),Name.wc_str(),_(KEY_CONTROL_TYPE)),&ControlType))

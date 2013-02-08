@@ -29,10 +29,10 @@ bool CMySerial::IsRunning()
 	return _IsRunning;
 }
 
-nmeaINFO CMySerial::GetNmeaINFO()
-{
-	return _info;
-}
+//nmeaINFO CMySerial::GetNmeaINFO()
+//{
+	//return _info;
+//}
 
 void CMySerial::OnConnect()
 {
@@ -96,11 +96,9 @@ void CMySerial::OnReconnect()
 {
 	char str[32];
 	sprintf(str,"%s %d\n",GetPortName(),GetBaudRate());
-	nmea_zero_INFO(&_info);
-	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
-	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",&str);
-	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetPort",GetPortName());
-	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetBaud",(void*)GetBaudRate());
+	//nmea_zero_INFO(&_info);
+	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
+	
 }
 
 void CMySerial::OnAfterMainLoop()
@@ -117,14 +115,14 @@ void CMySerial::OnBeforeMainLoop()
 
 void CMySerial::OnLine(unsigned char *line)
 {
-	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info))
+	
+	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info));
 		_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
-
+	
+	nmea_parser_buff_clear(&_parser);
 }
 
 void CMySerial::OnNoSignal()
 {
-	_info.sig = 0;
-	//_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
 	_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_NoSignal",NULL);
 }

@@ -46,8 +46,12 @@ CStatus::CStatus(CMySerial *serial)
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAUD).wc_str(),serial->GetBaudRate()));
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_CONNECTED).wc_str(),serial->IsConnected()));
 	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_BAD_CRC).wc_str(),serial->GetBadCRC()));
-	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_NMEA_LINES).wc_str(),serial->GetLinesCount()));	
-	Status->AppendText(wxString::Format(_("%s: %d%%\n\n"),GetMsg(MSG_SIGNAL_QUALITY).wc_str(),serial->GetSignalQuality()));	
+	Status->AppendText(wxString::Format(_("%s: %d\n"),GetMsg(MSG_NMEA_LINES).wc_str(),serial->GetLinesCount()));
+	
+	if(serial->GetLinesCount() == 0)
+		Status->AppendText(_("N/A"));	
+	else
+		Status->AppendText(wxString::Format(_("%s: %d%%\n\n"),GetMsg(MSG_SIGNAL_QUALITY).wc_str(),serial->GetSignalQuality()));	
 
 	for(size_t i = 0; i < serial->GetSignalCount();i++)
 	{

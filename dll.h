@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 //. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 
-class CTrack;
+//class CTrack;
 class CTrackList;
 class CMyFrame;
 
@@ -51,7 +51,7 @@ class CMapPlugin :public CNaviMapIOApi
 	CNaviBroker *Broker;
 	CTrack *Track;
 	CTrackList *TrackList;
-	CNaviPixmapFont *Font;
+	//CNaviPixmapFont *Font;
 	bool NeedExit;
 	bool IsData;
 	bool _Exit;
