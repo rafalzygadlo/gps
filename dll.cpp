@@ -797,12 +797,12 @@ void CMapPlugin::RenderPosition()
 	glPushMatrix();
 		glLineWidth(2);
 		glTranslated(GpsX,GpsY,0.0);
-		glScalef(60.0/Scale,60.0/Scale,0.0f);
+		glScalef(40.0/Scale,40.0/Scale,0.0f);
 		glRotatef(NmeaInfo.direction,0.0f,0.0f,1.0f);
 		RenderGeometry(GL_LINE_LOOP,&vCircle1[0],vCircle1.size());	// circle 1
 		RenderGeometry(GL_LINE_LOOP,&vCircle2[0],vCircle2.size());  // circle 2
 		RenderGeometry(GL_LINE_LOOP,&vCircle3[0],vCircle3.size());  // circle 3
-		RenderGeometry(GL_POINTS,&vCircle3[0],vCircle3.size());  // circle 3
+		//RenderGeometry(GL_POINTS,&vCircle3[0],vCircle3.size());  // circle 3
 		Boat->RenderBoat();
 		glLineWidth(1);
     glPopMatrix();
@@ -872,7 +872,9 @@ void CMapPlugin::RenderDistance()
 	glPushMatrix();
 	glTranslatef(v1 ,v2 ,0.0f);
 	glScalef(0.6/Scale,0.6/Scale,0.0f);
+	glEnable(GL_TEXTURE_2D);
 	Broker->Print(Broker->GetParentPtr(),0.0f,0.0f,val);
+	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 
 }
@@ -908,7 +910,7 @@ void CMapPlugin::Render(void)
 		
 	}
         
-	RenderSelectedTrack();
+	//RenderSelectedTrack();
 	//RenderAnimation();	
 			
     glDisable(GL_BLEND);
@@ -948,7 +950,7 @@ const NAVIMAPAPI wchar_t *NaviPluginIntroduce(int LangID)
 
 int NAVIMAPAPI GetNaviPluginType(void)
 {
-    return MAP_PLUGIN_RUN_ON_DEMAND;
+    return MAP_PLUGIN_RUN_ON_DEMAND | RENDER_PRIORITY_10;
 }
 #if defined(_WIN32) || defined(_WIN64)
 int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void*)

@@ -54,8 +54,7 @@ void CMySerial::OnNewSignal()
 
 void CMySerial::OnData(unsigned char *buffer, int length)
 {
-    _Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetLog",(void*)buffer);
-    
+     
 }
 
 void CMySerial::OnValid()
@@ -116,7 +115,7 @@ void CMySerial::OnBeforeMainLoop()
 void CMySerial::OnLine(unsigned char *line)
 {
 	
-	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info));
+	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info))
 		_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
 	
 	nmea_parser_buff_clear(&_parser);
