@@ -4,6 +4,11 @@
 #include <wx/mstream.h>
 #include <wx/animate.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+
 CMyInfo::CMyInfo(wxWindow *Parent, wxString text)
 	:wxDialog(Parent, wxID_ANY, _(PRODUCT_NAME), wxDefaultPosition, wxDefaultSize)
 {

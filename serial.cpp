@@ -3,6 +3,10 @@
 #include "dll.h"
 #include "tools.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 CMySerial::CMySerial(CNaviBroker *Broker):CSerial()
 {
     _IsRunning = false;

@@ -1,11 +1,14 @@
 #include "boat.h"
 #include "tools.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 CBoat::CBoat()
 {
 	BoatGeometryGroup = CNaviGeometryGroup::Create(NULL);
-		
+
 	CNaviVertexArray *VertexArray = VertexArray = CNaviVertexArray::Create(NULL);
 	VertexArray->SetType(EXTERIOR_VERTEX_ARRAY);
 	

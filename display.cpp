@@ -3,6 +3,9 @@
 #include "display.h"
 #include <wx/wx.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 BEGIN_EVENT_TABLE(CDisplayPlugin,CNaviDiaplayApi)
     EVT_CONTEXT_MENU(CDisplayPlugin::OnMenu)
@@ -70,6 +73,7 @@ CDisplayPlugin::~CDisplayPlugin()
 	FileConfig->Write(wxString::Format(_("%s/%s"),Name,_(KEY_CONTROL_PRECISION)),Precision);
 	FileConfig->Write(wxString::Format(_("%s/%s"),Name,_(KEY_CONTROL_TYPE)),ControlType);
 	FileConfig->Write(wxString::Format(_("%s/%s"),Name,_(KEY_FORMAT_TYPE)),FormatType);
+	ArrayOfTypes.Clear();
 	
 	delete FileConfig;
 }

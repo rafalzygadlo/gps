@@ -3,6 +3,8 @@
 #include <nmea/nmea.h>
 #include <wx/wx.h>
 
+
+
 typedef enum nvSpeed	{nvKn, nvkmh, nvms, nvmph, nvfts, NVSPEED_COUNT = 5};
 typedef enum nvLon		{nvdegree, NVLON_COUNT = 1};
 typedef enum nvDate		{nvYYMMHH, nvMMDDYY, NVDATE_COUNT = 2};

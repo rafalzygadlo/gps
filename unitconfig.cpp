@@ -3,6 +3,10 @@
 #include "tools.h"
 #include "conf.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 BEGIN_EVENT_TABLE(CUnitConfig,wxDialog)
 	EVT_RADIOBUTTON(wxID_ANY,CUnitConfig::OnRadio)
 END_EVENT_TABLE()

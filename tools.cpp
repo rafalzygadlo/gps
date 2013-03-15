@@ -2,6 +2,9 @@
 #include "tools.h"
 #include <wx/stdpaths.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 int GlobalLanguageID;
 wxMutex *mutex = new wxMutex;

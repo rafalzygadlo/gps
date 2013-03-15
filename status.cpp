@@ -10,10 +10,14 @@
 #include "conf.h"
 #include "tools.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+
 BEGIN_EVENT_TABLE(CStatus,wxDialog)
 	EVT_BUTTON(ID_CLOSE,OnCloseButton)
 END_EVENT_TABLE()
-
 
 CStatus::CStatus(CMySerial *serial)
 	:wxDialog(NULL,wxID_ANY, GetProductName() , wxDefaultPosition, wxDefaultSize )

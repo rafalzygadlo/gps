@@ -11,6 +11,9 @@
 #include "boatconfig.h"
 #include "GeometryTools.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
 
 unsigned char PluginInfoBlock[] = {
 0x39,0x0,0x0,0x0,0x4c,0x23,0xc8,0xc1,0xb0,0x7d,0x9,0x9b,0x41,0xf3,0x21,0x4d,0x1d,0x24,0x60,0x76,0x4c,0xd0,0x9b,0x5b,0xe6,0xc1,0xda,0xad,0x8c,0x1e,0x4a,0xa5,0xad,0xb7,
@@ -172,7 +175,7 @@ CNaviBroker *CMapPlugin::GetBroker()
 
 void CMapPlugin::Run(void *Params)
 {
-	_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
+	//_CrtSetDbgFlag ( _CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF );
     
 	/*
 	wxString fontFile(FONT_NAME,wxConvUTF8);
@@ -919,23 +922,11 @@ void CMapPlugin::Render(void)
 
 }
 
-
-
 //	 API dla DLL
 void NAVIMAPAPI *CreateNaviClassInstance(CNaviBroker *NaviBroker)
 {
    CMapPlugin *DLL = new CMapPlugin(NaviBroker);
-   return (void*) ( DLL );
-}
-
-const NAVIMAPAPI wchar_t *NaviPluginDescription(int LangID)
-{
-#if defined(_WIN32) || defined(_WIN64)
-    return TEXT("GPS plugin automatic port detection.");
-#endif
-#if defined(_LINUX32) || defined(_LINUX64)
-    return L"GPS plugin automatic port detection.";
-#endif
+  return static_cast<void*> ( DLL );
 }
 
 const NAVIMAPAPI wchar_t *NaviPluginIntroduce(int LangID)
@@ -952,12 +943,6 @@ int NAVIMAPAPI GetNaviPluginType(void)
 {
     return MAP_PLUGIN_RUN_ON_DEMAND | RENDER_PRIORITY_10;
 }
-#if defined(_WIN32) || defined(_WIN64)
-int WINAPI DllEntryPoint(HINSTANCE hinst, unsigned long reason, void*)
-{
-    return 1;
-}
-#endif
 
 unsigned char *GetNaviPluginInfoBlock()
 {

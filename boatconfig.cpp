@@ -4,6 +4,10 @@
 #include "conf.h"
 #include "boat.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 BEGIN_EVENT_TABLE(CBoatConfig,wxDialog)
 	EVT_LISTBOX(ID_BOAT,CBoatConfig::OnBoat)
 END_EVENT_TABLE()

@@ -10,6 +10,10 @@
 #include "unitconfig.h"
 #include "boatconfig.h"
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 DEFINE_EVENT_TYPE(nvEVT_SET_LOG)
 DEFINE_EVENT_TYPE(nvEVT_SET_PORT)
 DEFINE_EVENT_TYPE(nvEVT_SET_BAUD)
