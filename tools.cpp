@@ -181,8 +181,8 @@ wxString FormatLatitude(float y)
 
 void PrintInfo(CNaviBroker *Broker,int UID,wchar_t *text)
 {
-	if(Broker != NULL)
-		Broker->PrintInfoBlock(Broker->GetParentPtr(), UID , text, 5);
+//	if(Broker != NULL)
+//		Broker->PrintInfoBlock(Broker->GetParentPtr(), UID , text, 5);
 
 }
 
@@ -245,11 +245,11 @@ void nvMidPoint(double lon1, double lat1,double lon2, double lat2, double *v1, d
 double nvDistance(double lon1, double lat1, double lon2, double lat2, size_t distanceunit) 
 {
 
-	double dLat = nvToRad( lat2 - lat1 );
-	double dLon = nvToRad( lon2 - lon1 );
+	double dLat = _nvToRad( lat2 - lat1 );
+	double dLon = _nvToRad( lon2 - lon1 );
 	double R = 6371.0;
 
-	double a = ( sin(dLat/2) * sin(dLat/2) )  +  ( cos( nvToRad(lat1) ) * cos( nvToRad(lat2) ) * sin(dLon/2) * sin(dLon/2) );
+	double a = ( sin(dLat/2) * sin(dLat/2) )  +  ( cos( _nvToRad(lat1) ) * cos( _nvToRad(lat2) ) * sin(dLon/2) * sin(dLon/2) );
 	double c = 2 * atan2( sqrt(a), sqrt( 1 - a ) );
 
 	switch( distanceunit ) {
@@ -263,7 +263,7 @@ double nvDistance(double lon1, double lat1, double lon2, double lat2, size_t dis
 	}
 }
 
-double nvToRad( double degree ) 
+double _nvToRad( double degree ) 
 {
 	return (NV_PI * degree / 180 );
 }

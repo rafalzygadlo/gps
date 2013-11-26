@@ -6,7 +6,6 @@
 #include <vector>
 #include <wx/wx.h>
 #include "NaviDisplayApi.h"
-#include "NaviFont.h"
 
 #include <wx/fileconf.h>
 

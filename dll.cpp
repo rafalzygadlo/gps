@@ -207,11 +207,12 @@ void CMapPlugin::Run(void *Params)
 	if(exists)
 	{	
 		FileConfig->Read(_(KEY_PORT), &port);
-		MySerial->SetPort(port.char_str());
+		MySerial->_SetPort(port.char_str());
 
 		int baud;
 		FileConfig->Read(_(KEY_BAUD), &baud);
 		MySerial->SetBaud(baud);
+		MySerial->SetCheckCRC(true);
 
 		bool running;
 		FileConfig->Read(_(KEY_RUNNING), &running);
@@ -876,7 +877,7 @@ void CMapPlugin::RenderDistance()
 	glTranslatef(v1 ,v2 ,0.0f);
 	glScalef(0.6/Scale,0.6/Scale,0.0f);
 	glEnable(GL_TEXTURE_2D);
-	Broker->Print(Broker->GetParentPtr(),0.0f,0.0f,val);
+//	Broker->Print(Broker->GetParentPtr(),0.0f,0.0f,val);
 	glDisable(GL_TEXTURE_2D);
 	glPopMatrix();
 

@@ -37,7 +37,7 @@ public:
 		virtual void OnConnect();
 		virtual void OnDisconnect();
 		virtual void OnData(unsigned char *buffer, int length);
-		virtual void OnLine(unsigned char* line);
+		virtual void OnLine(unsigned char *buffer, int length);
 		virtual void OnStart();
 		virtual void OnStop();
 		virtual void OnAfterMainLoop();

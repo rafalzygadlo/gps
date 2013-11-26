@@ -283,7 +283,7 @@ void CMyFrame::OnStartButton(wxCommandEvent &event)
 	BaudComboBox->Disable();
 	PortComboBox->SetValue(port);
 	BaudComboBox->SetValue(baud);
-	MapPlugin->GetMySerial()->SetPort(PortComboBox->GetValue().char_str());
+	MapPlugin->GetMySerial()->_SetPort(PortComboBox->GetValue().char_str());
 	long _baud;
 	BaudComboBox->GetValue().ToLong(&_baud);
 	MapPlugin->GetMySerial()->SetBaud(_baud);

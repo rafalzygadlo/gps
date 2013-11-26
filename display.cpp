@@ -711,8 +711,8 @@ void CDisplayPlugin::DrawSearchSatellites(wxGCDC &dc)
 void CDisplayPlugin::DrawSatellites(wxGCDC &dc)
 {
 		
-	if(!CheckGpsValid(dc) )
-		return;
+//	if(!CheckGpsValid(dc) )
+	//	return;
 	
 	DrawBackground(dc);	
 	wxPen pen;	
@@ -863,11 +863,9 @@ const wchar_t *NaviDisplayIntroduce(int LanguageID)
 
 	switch( LanguageID ) 
 	{
-
 		case 0: 
 			return L"GPS";
-			break;
-
+	
 		default:
 			return L"GPS";
 	}

@@ -33,11 +33,6 @@ bool CMySerial::IsRunning()
 	return _IsRunning;
 }
 
-//nmeaINFO CMySerial::GetNmeaINFO()
-//{
-	//return _info;
-//}
-
 void CMySerial::OnConnect()
 {
     wxString port_name(GetPortName(),wxConvUTF8);
@@ -116,10 +111,10 @@ void CMySerial::OnBeforeMainLoop()
 }
 
 
-void CMySerial::OnLine(unsigned char *line)
+void CMySerial::OnLine(unsigned char *buffer, int length)
 {
 	
-	if(nmea_parse(&_parser, (char*)line, strlen((char*)line), &_info))
+	if(nmea_parse(&_parser, (char*)buffer, length, &_info))
 		_Broker->ExecuteFunction(_Broker->GetParentPtr(),"gps_SetNMEAInfo",&_info);
 	
 	nmea_parser_buff_clear(&_parser);
